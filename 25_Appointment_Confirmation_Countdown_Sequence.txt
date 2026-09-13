@@ -1,0 +1,162 @@
+================================================================================
+MASTER APPOINTMENT CONFIRMATION & COUNTDOWN SEQUENCE
+(Email & SMS Workflow Copy for GoHighLevel / CRMs)
+================================================================================
+
+TRIGGER: Immediately Upon Booking
+STEP 1: Instant Confirmation (Email + SMS)
+
+--------------------------------------------------------------------------------
+✉️ EMAIL #1: Instant Booking Confirmation & Calendar Invite
+Send: Immediately Upon Booking
+--------------------------------------------------------------------------------
+SUBJECT: Confirmed: Coffee Date with David Olaniyi [{{appointment.start_time}}]
+
+Hey {{contact.first_name}},
+
+Your 15-Minute Zoom Coffee Date Demo with David Olaniyi is officially locked in!
+
+Here are your meeting details for easy reference:
+
+📅 Date & Time: {{appointment.start_time}}
+💻 Zoom Meeting Link: {{appointment.zoom_url}}
+⏳ Duration: 15 Minutes (Strictly respected)
+
+What we will cover on this live 15-minute call:
+1. CRM Revenue Leak Audit: We'll examine your specific Quiz Result ({{contact.quiz_bucket_name}}).
+2. AI Sales Agent Live Demo: You will see a live demonstration of how our AI Android reactivates dormant leads in real time.
+3. Custom Revenue Estimate: We will calculate how much lost cash flow can be recovered from your current database over the next 30 days.
+
+👉 Calendar Action Required: Please click below to add this event to your Google / Apple Calendar so you don't miss it:
+[Add to Google Calendar] | [Add to Outlook / Apple Calendar]
+
+If you need to reschedule or invite a team member, reply directly to this email.
+
+Looking forward to speaking with you!
+
+Best regards,
+
+David Olaniyi
+Founder & AI Lead Reactivation Specialist
+STRATAVIN LLC • Performance Revenue Engines
+
+
+--------------------------------------------------------------------------------
+📱 SMS #1: Instant Booking Confirmation Text
+Send: Immediately Upon Booking
+--------------------------------------------------------------------------------
+Hey {{contact.first_name}}, your 15-Min Coffee Date Demo with David Olaniyi is confirmed for {{appointment.start_time}}! Here is your Zoom link: {{appointment.zoom_url}}. Add to your calendar now!
+
+
+================================================================================
+TRIGGER: 24 Hours Before Meeting
+STEP 2: 24-Hour Countdown Teaser (Email + SMS)
+
+--------------------------------------------------------------------------------
+✉️ EMAIL #2: 24-Hour Prep & Case Study Preview
+Send: 24 Hours Before
+--------------------------------------------------------------------------------
+SUBJECT: Tomorrow: Our 15-Min Coffee Date Demo [{{contact.first_name}}]
+
+Hey {{contact.first_name}},
+
+Quick reminder that our 15-Minute Zoom Coffee Date Demo is tomorrow at {{appointment.start_time}}!
+
+💻 Zoom Link: {{appointment.zoom_url}}
+
+Quick Prep Note:
+You don't need to prepare anything complicated for tomorrow. If you have your approximate total database size (e.g., number of past leads or unclosed proposals), bring that number along — we'll plug it live into our revenue recovery model.
+
+Before we hop on tomorrow, take 2 minutes to review how we helped a client recover $48,000 in unclosed pipeline within their first 14 days using automated AI follow-ups:
+👉 [Click Here To Read The 2-Minute Proof Case Study]
+
+See you tomorrow on Zoom!
+
+Best regards,
+
+David Olaniyi
+STRATAVIN LLC
+
+
+--------------------------------------------------------------------------------
+📱 SMS #2: 24-Hour Reminder Text
+Send: 24 Hours Before
+--------------------------------------------------------------------------------
+Hey {{contact.first_name}}, see you tomorrow at {{appointment.start_time}} for our 15-Min Coffee Date Demo! Zoom link: {{appointment.zoom_url}}. Reply YES to confirm!
+
+
+================================================================================
+TRIGGER: 1 Hour Before Meeting
+STEP 3: 1-Hour Final Notice (Email + SMS)
+
+--------------------------------------------------------------------------------
+✉️ EMAIL #3: 1-Hour Countdown Alert
+Send: 1 Hour Before
+--------------------------------------------------------------------------------
+SUBJECT: [Starting in 1 Hour] Coffee Date with David Olaniyi
+
+Hey {{contact.first_name}},
+
+We're starting our 15-Minute Zoom Coffee Date Demo in exactly 1 hour!
+
+⏰ Time: Starting in 60 Minutes
+💻 Click Here To Join Zoom Room: {{appointment.zoom_url}}
+
+Grab your coffee or tea, test your audio/camera, and click the link above when we kick off.
+
+See you in 1 hour!
+
+David Olaniyi
+STRATAVIN LLC
+
+
+--------------------------------------------------------------------------------
+📱 SMS #3: 1-Hour Reminder Text
+Send: 1 Hour Before
+--------------------------------------------------------------------------------
+Hey {{contact.first_name}}! We kick off our 15-Min Coffee Date Demo in 1 hour. Grab your coffee and join here: {{appointment.zoom_url}}
+
+
+================================================================================
+TRIGGER: 10 Minutes Before Meeting
+STEP 4: 10-Minute Last-Call Text (SMS Only)
+
+--------------------------------------------------------------------------------
+📱 SMS #4: 10-Minute Final Join Text
+Send: 10 Minutes Before
+--------------------------------------------------------------------------------
+{{contact.first_name}} — I'm logging into our Zoom room now! Here's your link: {{appointment.zoom_url}}. See you in 10 mins! ☕
+
+
+================================================================================
+TRIGGER: 15 Mins Post-Appointment (If Status = No Show)
+STEP 5: No-Show Re-engagement Backup Workflow
+
+--------------------------------------------------------------------------------
+✉️ BACKUP EMAIL: Friendly Missed Call Reschedule
+Send: 15 Mins After Missed Call
+--------------------------------------------------------------------------------
+SUBJECT: Did we miss each other? (Coffee Date with David)
+
+Hey {{contact.first_name}},
+
+I just tried hopping on our Zoom room for our 15-Minute Coffee Date Demo, but missed you!
+
+I know calendar conflicts and urgent client calls happen unexpectedly.
+
+I'd still love to show you the live AI demo and walk through your custom revenue recovery plan.
+
+👉 Click here to quickly pick a new time that fits your schedule:
+[Click Here To Reschedule Your 15-Min Coffee Date Demo]
+
+Talk soon!
+
+David Olaniyi
+STRATAVIN LLC
+
+
+--------------------------------------------------------------------------------
+📱 BACKUP SMS: Missed Call Quick Text
+Send: 15 Mins After Missed Call
+--------------------------------------------------------------------------------
+Hey {{contact.first_name}}, missed you on Zoom just now! No worries at all — grab a new time on my calendar here whenever you're ready: {{booking_url}}

@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #1E90FF;
+  --color-primary-light: #5CBAFF;
+  --color-primary-dark: #0F1B2D;
+  --color-gold: #FFCC00;
+  --color-gold-hover: #E6B800;
+  --color-light-teal: #eef5fc;
+  --color-beige: #F8FAFC;
+  --color-sand: #FFFFFF;
+  --color-gray-text: #4a4a4a;
+}
+
+@layer base {
+  body {
+    @apply antialiased text-gray-text bg-white;
+  }
+}
