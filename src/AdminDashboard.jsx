@@ -4,7 +4,7 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { Users, Target, CheckCircle, Mail } from 'lucide-react';
 import { CONFIG } from './quizConfig';
 
-const CLIENT_ID = import.meta.env.VITE_CLIENT_ID || 'beacon_abuja_quiz';
+const CLIENT_ID = import.meta.env.VITE_CLIENT_ID || 'navy_estate_innovation_city_quiz';
 
 export default function AdminDashboard() {
   const [data, setData] = useState([]);
@@ -102,13 +102,28 @@ export default function AdminDashboard() {
   const exportLeadsToCSV = () => {
      if (leadEvents.length === 0) return alert("No leads available to export yet.");
      
-     const headers = ["Date Captured", "Name", "Email", "Phone", "Assigned Marketing Bucket", "Client ID"];
+     const headers = [
+       "Date Captured", 
+       "Name", 
+       "Phone", 
+       "Email", 
+       "Applicant Category", 
+       "Selected Plot", 
+       "Official Rate", 
+       "Inspection Timing", 
+       "Development Name", 
+       "Tenant ID"
+     ];
      const rows = leadEvents.map(e => [
          new Date(e.timestamp).toLocaleString(),
          e.data?.name || '',
-         e.data?.email || '',
          e.data?.phone || '',
-         e.data?.assigned_bucket || '',
+         e.data?.email || '',
+         e.data?.applicant_category || e.data?.category || '',
+         e.data?.selected_plot || '',
+         e.data?.plot_price || '',
+         e.data?.inspection_timing || '',
+         e.data?.matched_estate_name || CONFIG.developmentName,
          e.client_id
      ]);
      
@@ -119,7 +134,7 @@ export default function AdminDashboard() {
      const encodedUri = encodeURI(csvContent);
      const link = document.createElement("a");
      link.setAttribute("href", encodedUri);
-     link.setAttribute("download", `Reactivation_Leads_Export_${new Date().toISOString().split('T')[0]}.csv`);
+     link.setAttribute("download", `NBCCL_Navy_Estate_Leads_${new Date().toISOString().split('T')[0]}.csv`);
      document.body.appendChild(link);
      link.click();
      document.body.removeChild(link);
@@ -127,18 +142,30 @@ export default function AdminDashboard() {
 
   const seedDemoLead = () => {
     const timestamp = new Date().toISOString();
-    const buckets = ['SD', 'CL', 'VG', 'GI'];
-    const randomBucket = buckets[Math.floor(Math.random() * buckets.length)];
+    const isMilitary = Math.random() > 0.5;
     const randomNum = Math.floor(100 + Math.random() * 900);
+    const category = isMilitary ? 'I am a Military Personnel' : 'I am a Civilian';
+    const plots = isMilitary 
+      ? ['170 SQM (₦9.5M)', '250 SQM (₦13.5M)', '450 SQM (₦22.3M)', '600 SQM (₦29.5M)']
+      : ['170 SQM (₦12M)', '250 SQM (₦16M)', '450 SQM (₦24.8M)', '600 SQM (₦32M)'];
+    const chosenPlot = plots[Math.floor(Math.random() * plots.length)];
+    const inspections = ['This Week', 'This Weekend', 'Next Week', 'I am Outside Abuja / Overseas'];
+    const chosenInspection = inspections[Math.floor(Math.random() * inspections.length)];
+
     const demoLead = {
        id: 'evt_' + Math.random().toString(36).substr(2, 9),
        client_id: CLIENT_ID,
        event_type: 'Lead Captured',
        data: {
-          name: `Demo Lead #${randomNum}`,
-          email: `demo.prospect${randomNum}@company.com`,
-          phone: `(555) 234-${randomNum}`,
-          assigned_bucket: randomBucket
+          name: `Sample Applicant #${randomNum}`,
+          email: `applicant${randomNum}@example.com`,
+          phone: `+234 803 000 ${randomNum}`,
+          applicant_category: category,
+          selected_plot: chosenPlot,
+          plot_price: chosenPlot.split('(')[1]?.replace(')', '') || '',
+          inspection_timing: chosenInspection,
+          matched_estate_name: CONFIG.developmentName,
+          assigned_bucket: 'INNOVATION_CITY'
        },
        timestamp: timestamp
     };
@@ -147,7 +174,7 @@ export default function AdminDashboard() {
     existing.push(
       { id: 'evt_v_' + randomNum, client_id: CLIENT_ID, event_type: 'Landing Page Viewed', timestamp },
       { id: 'evt_s_' + randomNum, client_id: CLIENT_ID, event_type: 'Quiz Started', timestamp },
-      { id: 'evt_c_' + randomNum, client_id: CLIENT_ID, event_type: 'Quiz Completed', data: { assigned_bucket: randomBucket }, timestamp },
+      { id: 'evt_c_' + randomNum, client_id: CLIENT_ID, event_type: 'Quiz Completed', data: { assigned_bucket: 'INNOVATION_CITY' }, timestamp },
       demoLead
     );
     localStorage.setItem('quiz_analytics_local', JSON.stringify(existing));
@@ -209,13 +236,13 @@ export default function AdminDashboard() {
       <div className="max-w-7xl mx-auto">
         
         {/* Top Navbar Header */}
-        <header className="mb-10 flex flex-col md:flex-row justify-between items-start md:items-center bg-white border border-gray-200 rounded-xl px-8 py-6 shadow-sm">
+        <header className="mb-10 flex flex-col md:flex-row justify-between items-start md:items-center bg-white border border-slate-200 rounded-2xl px-8 py-6 shadow-sm">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 tracking-tight flex items-center gap-2">
-               <span className="w-6 h-6 bg-red-600 text-white rounded-lg flex items-center justify-center text-xs font-black">🏛️</span> 
-               Beacon Corporate Realty — Abuja Property Matcher Dashboard
+            <h1 className="text-2xl font-black text-[#0A2558] tracking-tight flex items-center gap-2.5">
+               <span className="w-8 h-8 bg-[#0A2558] text-[#C59B27] rounded-xl flex items-center justify-center text-sm font-black shadow-sm">⚓</span> 
+               Naval Building & Construction Company Limited (NBCCL)
             </h1>
-            <p className="text-xs text-gray-500 mt-1">Real-time Lead Capture, Matched Estates & Funnel Drop-off Analytics</p>
+            <p className="text-xs font-semibold text-slate-500 mt-1">Navy Estate Innovation City — Cadastral Zone, Apo | Live Funnel Analytics</p>
           </div>
           <div className="flex flex-wrap items-center gap-5 mt-4 md:mt-0 text-sm font-semibold text-gray-500">
              
@@ -235,20 +262,20 @@ export default function AdminDashboard() {
 
              <div className="flex flex-col ml-2">
                 <span className="text-[10px] uppercase text-gray-400 font-bold">Client / Project ID:</span>
-                <span className="text-gray-800 bg-amber-50 border border-amber-200 rounded px-3 py-1 font-mono tracking-wider text-xs font-bold uppercase">
+                <span className="text-[#0A2558] bg-[#EEF4FC] border border-[#CBDDF7] rounded px-3 py-1 font-mono tracking-wider text-xs font-bold uppercase">
                   {CLIENT_ID}
                 </span>
              </div>
              
-             <button onClick={fetchData} className="bg-orange-500 hover:bg-orange-600 text-white py-2 px-6 rounded shadow text-xs uppercase tracking-widest transition-colors font-bold ml-2">
+             <button onClick={fetchData} className="bg-[#0A2558] hover:bg-[#185ADB] text-white py-2 px-6 rounded-xl shadow-xs text-xs uppercase tracking-widest transition-colors font-bold ml-2 cursor-pointer">
                Refresh Data
              </button>
 
-             <button onClick={seedDemoLead} className="bg-emerald-600 hover:bg-emerald-700 text-white py-2 px-5 rounded shadow text-xs uppercase tracking-widest transition-colors font-bold">
+             <button onClick={seedDemoLead} className="bg-emerald-600 hover:bg-emerald-700 text-white py-2 px-5 rounded-xl shadow-xs text-xs uppercase tracking-widest transition-colors font-bold cursor-pointer">
                🧪 Simulate Test Lead
              </button>
 
-             <button onClick={exportLeadsToCSV} className="bg-gray-800 hover:bg-black text-white py-2 px-5 rounded shadow text-xs uppercase tracking-widest transition-colors font-bold">
+             <button onClick={exportLeadsToCSV} className="bg-slate-800 hover:bg-black text-white py-2 px-5 rounded-xl shadow-xs text-xs uppercase tracking-widest transition-colors font-bold cursor-pointer">
                Export Leads (CSV)
              </button>
           </div>
@@ -269,8 +296,8 @@ export default function AdminDashboard() {
                <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Completion Rate</span>
                <span className="text-lg font-black text-gray-700">{completionRate}%</span>
              </div>
-             <div className="w-full bg-orange-50 h-2.5 rounded-full overflow-hidden">
-               <div className="bg-[#E67E22] h-full rounded-full transition-all duration-1000" style={{ width: `${completionRate}%`}}></div>
+             <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+               <div className="bg-[#0A2558] h-full rounded-full transition-all duration-1000" style={{ width: `${completionRate}%`}}></div>
              </div>
            </div>
            
@@ -281,8 +308,8 @@ export default function AdminDashboard() {
                <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Lead Opt-In Rate</span>
                <span className="text-lg font-black text-gray-700">{optInRate}%</span>
              </div>
-             <div className="w-full bg-orange-50 h-2.5 rounded-full overflow-hidden">
-               <div className="bg-[#E67E22] h-full rounded-full transition-all duration-1000" style={{ width: `${optInRate}%`}}></div>
+             <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+               <div className="bg-[#0A2558] h-full rounded-full transition-all duration-1000" style={{ width: `${optInRate}%`}}></div>
              </div>
            </div>
         </div>
@@ -297,7 +324,7 @@ export default function AdminDashboard() {
                         <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#888', fontSize: 13, fontWeight: 600}} dy={15} />
                         <YAxis axisLine={false} tickLine={false} tick={{fill: '#bbb', fontSize: 13}} dx={-10} />
                         <Tooltip contentStyle={{ borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)', border: 'none' }} />
-                        <Area type="monotone" dataKey="count" stroke="#E67E22" fill="#FDEBD0" strokeWidth={3} />
+                        <Area type="monotone" dataKey="count" stroke="#0A2558" fill="#EEF4FC" strokeWidth={3} />
                     </AreaChart>
                 </ResponsiveContainer>
             </div>
@@ -310,7 +337,7 @@ export default function AdminDashboard() {
                    <h3 className="text-lg font-bold text-gray-800 tracking-tight">Step-by-Step Funnel Drop-off Analysis</h3>
                    <p className="text-xs text-gray-400">Track exact drop-off and conversion at every stage of this quiz funnel</p>
                 </div>
-                <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full uppercase tracking-wider">
+                <span className="text-xs font-bold text-[#0A2558] bg-[#EEF4FC] border border-[#CBDDF7] px-3 py-1 rounded-full uppercase tracking-wider">
                   Tenant: {CLIENT_ID}
                 </span>
             </div>
@@ -328,12 +355,15 @@ export default function AdminDashboard() {
                     </thead>
                     <tbody className="divide-y divide-gray-100 text-sm text-gray-700 font-medium">
                         {[
-                          { id: 'q1', label: 'Step 1', name: 'Primary Investment Goal', views: qStats['q1']?.views || participants || 0, answers: answerStats['q1']?.total || 0 },
-                          { id: 'q2', label: 'Step 2', name: 'Preferred Abuja District', views: qStats['q2']?.views || answerStats['q1']?.total || 0, answers: answerStats['q2']?.total || 0 },
-                          { id: 'q3', label: 'Step 3', name: 'Budget Comfort Range', views: qStats['q3']?.views || answerStats['q2']?.total || 0, answers: answerStats['q3']?.total || 0 },
-                          { id: 'q4', label: 'Step 4', name: 'Payment Structure Pacing', views: qStats['q4']?.views || answerStats['q3']?.total || 0, answers: answerStats['q4']?.total || 0 },
-                          { id: 'optin', label: 'Step 5', name: 'VIP Lead Capture Form', views: qStats['optin']?.views || completions || 0, answers: optIns },
-                          { id: 'schedule', label: 'Step 6', name: 'Inspection Calendar / Result', views: filteredData.filter(e => e.event_type === 'Calendar Booking Opened').length, answers: filteredData.filter(e => e.event_type === 'Appointment Confirmed').length },
+                          ...CONFIG.questions.map((q, idx) => ({
+                            id: q.id,
+                            label: `Step ${idx + 1}`,
+                            name: q.title,
+                            views: qStats[q.id]?.views || (idx === 0 ? participants : (answerStats[CONFIG.questions[idx - 1]?.id]?.total || 0)),
+                            answers: answerStats[q.id]?.total || 0
+                          })),
+                          { id: 'optin', label: `Step ${CONFIG.questions.length + 1}`, name: 'VIP Lead Capture Form', views: qStats['optin']?.views || completions || 0, answers: optIns },
+                          { id: 'schedule', label: `Step ${CONFIG.questions.length + 2}`, name: 'Inspection Booking Calendar', views: filteredData.filter(e => e.event_type === 'Calendar Booking Opened').length, answers: filteredData.filter(e => e.event_type === 'Appointment Confirmed').length },
                         ].map((row, idx, arr) => {
                           const prevViews = idx === 0 ? visitors || row.views || 1 : (arr[idx - 1].views || 1);
                           const retention = prevViews > 0 ? Math.min(100, Math.round((row.views / prevViews) * 100)) : 100;
@@ -363,7 +393,7 @@ export default function AdminDashboard() {
                    <h3 className="text-lg font-bold text-gray-800 tracking-tight">Question Answers Breakdown</h3>
                    <p className="text-xs text-gray-400">See what real visitors are selecting for each diagnostic question</p>
                 </div>
-                <span className="text-xs font-bold text-[#1E90FF] uppercase tracking-wider bg-blue-50 px-3 py-1 rounded-full">Real-Time Poll</span>
+                <span className="text-xs font-bold text-[#0A2558] uppercase tracking-wider bg-[#EEF4FC] border border-[#CBDDF7] px-3 py-1 rounded-full">Real-Time Poll</span>
             </div>
 
             {Object.keys(answerStats).length === 0 ? (
@@ -375,28 +405,32 @@ export default function AdminDashboard() {
                     {CONFIG.questions.map((q) => {
                         const qStat = answerStats[q.id];
                         const totalForQ = qStat?.total || 0;
+                        const optionsList = q.options || [
+                          ...(q.militaryOptions || []),
+                          ...(q.civilianOptions || [])
+                        ];
                         return (
-                            <div key={q.id} className="border border-gray-200 rounded-xl p-5 bg-gray-50/50">
+                            <div key={q.id} className="border border-slate-200 rounded-2xl p-5 bg-slate-50/70 shadow-2xs">
                                 <div className="flex justify-between items-start mb-3">
-                                   <span className="text-xs font-bold uppercase tracking-wider text-red-700 bg-red-100 px-2 py-0.5 rounded">{q.id.toUpperCase()}</span>
-                                   <span className="text-xs font-bold text-gray-400">{totalForQ} response{totalForQ === 1 ? '' : 's'}</span>
+                                   <span className="text-xs font-black uppercase tracking-wider text-[#0A2558] bg-[#EEF4FC] border border-[#CBDDF7] px-2.5 py-0.5 rounded-full">{q.id.toUpperCase()}</span>
+                                   <span className="text-xs font-bold text-slate-500">{totalForQ} response{totalForQ === 1 ? '' : 's'}</span>
                                 </div>
-                                <h4 className="text-sm font-bold text-gray-800 mb-4">{q.title || q.text}</h4>
+                                <h4 className="text-sm font-black text-slate-900 mb-4">{q.title || q.text}</h4>
                                 
-                                <div className="space-y-3">
-                                   {q.options.map((opt, oIdx) => {
-                                      const rawText = opt.title || opt.text || '';
+                                <div className="space-y-2.5">
+                                   {optionsList.map((opt, oIdx) => {
+                                      const rawText = opt.title || opt.text || opt.size || '';
                                       const cleanKey = rawText.replace(/<[^>]*>?/gm, '').replace(/\s+/g, ' ').trim().toLowerCase();
                                       const count = qStat?.answers[cleanKey] || 0;
                                       const pct = totalForQ > 0 ? Math.round((count / totalForQ) * 100) : 0;
                                       return (
-                                         <div key={oIdx} className="bg-white border border-gray-200 rounded-lg p-3 text-xs">
-                                            <div className="flex justify-between font-semibold text-gray-700 mb-1 gap-2">
-                                               <span>{rawText}</span>
-                                               <span className="font-mono text-gray-500 shrink-0">{count} ({pct}%)</span>
+                                         <div key={oIdx} className="bg-white border border-slate-200/80 rounded-xl p-3 text-xs shadow-2xs">
+                                            <div className="flex justify-between font-bold text-slate-800 mb-1 gap-2">
+                                               <span>{rawText} {opt.shortTag ? `(${opt.shortTag})` : ''}</span>
+                                               <span className="font-mono text-slate-500 shrink-0">{count} ({pct}%)</span>
                                             </div>
-                                            <div className="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden">
-                                               <div className="bg-[#D9483B] h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`}}></div>
+                                            <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+                                               <div className="bg-[#0A2558] h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`}}></div>
                                             </div>
                                          </div>
                                       );
@@ -414,7 +448,7 @@ export default function AdminDashboard() {
             <div className="flex justify-between items-center mb-6">
                 <div>
                    <h3 className="text-lg font-bold text-gray-800 tracking-tight">Captured Leads ({leadEvents.length})</h3>
-                   <p className="text-xs text-gray-400">All submissions for Beacon Corporate Realty</p>
+                   <p className="text-xs text-gray-400">All submissions for Navy Estate Innovation City (NBCCL)</p>
                 </div>
                 <span className="text-xs font-semibold text-gray-400">Verified Contact Records</span>
             </div>
@@ -432,8 +466,9 @@ export default function AdminDashboard() {
                                 <th className="py-3 px-4">Name</th>
                                 <th className="py-3 px-4">Phone</th>
                                 <th className="py-3 px-4">Email</th>
-                                <th className="py-3 px-4">Matched Estate</th>
-                                <th className="py-3 px-4">Goal / Preference</th>
+                                <th className="py-3 px-4">Category</th>
+                                <th className="py-3 px-4">Selected Plot</th>
+                                <th className="py-3 px-4">Inspection Slot</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100 text-sm text-gray-700 font-medium">
@@ -446,12 +481,22 @@ export default function AdminDashboard() {
                                     <td className="py-3.5 px-4 font-mono text-xs font-bold text-slate-800">{e.data?.phone || 'N/A'}</td>
                                     <td className="py-3.5 px-4 text-blue-600 text-xs">{e.data?.email || 'N/A'}</td>
                                     <td className="py-3.5 px-4">
-                                        <span className="inline-block px-3 py-1 rounded-full text-xs font-black bg-red-50 text-[#D9483B] border border-red-200">
-                                            {e.data?.matched_estate_name || e.data?.assigned_bucket || 'Innovation City'}
+                                        <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-bold ${
+                                          (e.data?.applicant_category || e.data?.category)?.includes('Military') 
+                                            ? 'bg-amber-100 text-amber-900 border border-amber-200' 
+                                            : 'bg-blue-50 text-[#0A2558] border border-blue-200'
+                                        }`}>
+                                            {e.data?.applicant_category || e.data?.category || 'Civilian'}
                                         </span>
                                     </td>
-                                    <td className="py-3.5 px-4 text-xs text-slate-600 max-w-xs truncate">
-                                        {e.data?.investment_goal || 'Standard'} • {e.data?.preferred_district || ''}
+                                    <td className="py-3.5 px-4 text-xs font-bold text-slate-800">
+                                        {e.data?.selected_plot || 'N/A'}
+                                        {e.data?.plot_price ? <span className="text-emerald-700 ml-1.5 font-black">({e.data.plot_price})</span> : null}
+                                    </td>
+                                    <td className="py-3.5 px-4 text-xs text-slate-600">
+                                        <span className="bg-slate-100 px-2 py-0.5 rounded font-medium">
+                                          {e.data?.inspection_timing || 'Flexible'}
+                                        </span>
                                     </td>
                                 </tr>
                             ))}

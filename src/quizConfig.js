@@ -1,8 +1,17 @@
 export const CONFIG = {
   // Global Brand Setup
-  brandName: "Beacon Corporate Realty",
-  brandTagline: "Secure Your Tomorrow.",
-  quizTitle: "Abuja Property Matcher",
+  brandName: "Naval Building & Construction Company Limited",
+  brandShortName: "NBCCL",
+  developmentName: "Navy Estate Innovation City",
+  location: "Cadastral Zone, Apo, Abuja",
+  officeAddress: "Cluster C, Admiralty Estate, Navy Town Asokoro, FCT Abuja",
+  contactPhones: ["+234 703 829 2131", "+234 902 131 1681"],
+  contactEmail: "nbccl.ng@gmail.com",
+  formNumber: "JVA",
+  applicationFee: "₦30,000.00",
+  brandTagline: "Structured Development. Quality Infrastructure. Execution.",
+  quizTitle: "Navy Estate Innovation City Assessment",
+  facebookPixelId: import.meta.env.VITE_FACEBOOK_PIXEL_ID || "",
   
   // DIAGNOSIS STRATEGY
   diagnosisType: "PRODUCT_FINDER",
@@ -48,26 +57,27 @@ export const CONFIG = {
     },
     INNOVATION_CITY: {
       id: "INNOVATION_CITY",
-      name: "Innovation City [The Parliament]",
-      location: "Apo, Abuja",
-      tagline: "Prime Investment Address • Act Before Oct 1st Price Spike!",
+      name: "Navy Estate Innovation City",
+      location: "Cadastral Zone, Apo, Abuja",
+      developer: "Naval Building & Construction Company Limited (NBCCL)",
+      tagline: "Structured Development • Quality Infrastructure • Execution",
       image: "/innovation-city.jpg",
-      titleType: "FCDA C of O",
-      badgeText: "High Capital Growth",
-      paymentTerms: "50% Initial Deposit • Balance over 6 Months",
-      promoDeadline: "New Prices Take Effect 1st October, 2026",
+      titleType: "FCDA Cadastral Allocation",
+      badgeText: "Official Opening Offer",
+      paymentTerms: "Flexible Initial Deposit • Convenient Milestone Spread",
+      promoDeadline: "Opening Offer Limited Allocations",
       defaultPlot: "250 SQM Semi-Detached Plot",
-      defaultPrice: "₦15,000,000",
-      defaultMarketPrice: "₦22,500,000 (Effective Oct 1)",
-      defaultSavings: "₦7,500,000",
-      defaultIncentive: "50% Pre-Hike Equity Lock + Free Guided Site Tour",
+      defaultPrice: "₦13,500,000",
+      defaultMarketPrice: "₦16,000,000",
+      defaultSavings: "₦2,500,000",
+      defaultIncentive: "Verified Allocation Pass + Guided Site Inspection Tour",
       plots: [
-        { size: "170 SQM (Terrace)", promoPrice: "₦10M", nextPrice: "₦15M (+50% jump)" },
-        { size: "250 SQM (Semi-Detached)", promoPrice: "₦15M", nextPrice: "₦22.5M (+50% jump)" },
-        { size: "450 SQM (Penthouse)", promoPrice: "₦26M", nextPrice: "₦39M (+50% jump)" },
-        { size: "600 SQM (Lux Duplex)", promoPrice: "₦35M", nextPrice: "₦52.5M (+50% jump)" },
-        { size: "850 SQM (Mansion)", promoPrice: "₦50M", nextPrice: "₦75M (+50% jump)" },
-        { size: "1,200 SQM (Block of Flats)", promoPrice: "₦70M", nextPrice: "₦105M (+50% jump)" }
+        { size: "170 SQM", militaryPrice: "₦9.5M", civilianPrice: "₦12M", buildingType: "Terrace Duplex" },
+        { size: "250 SQM", militaryPrice: "₦13.5M", civilianPrice: "₦16M", buildingType: "Semi-Detached Duplex" },
+        { size: "450 SQM", militaryPrice: "₦22.3M", civilianPrice: "₦24.8M", buildingType: "Fully Detached Duplex" },
+        { size: "600 SQM", militaryPrice: "₦29.5M", civilianPrice: "₦32M", buildingType: "Luxury Detached Duplex" },
+        { size: "850 SQM", militaryPrice: "₦41.5M", civilianPrice: "₦44M", buildingType: "Executive Mansion" },
+        { size: "1,200 SQM", militaryPrice: "₦57.5M", civilianPrice: "₦60M", buildingType: "Block of Flats / Apartments" }
       ]
     },
     MAYFAIR_GARDEN: {
@@ -94,181 +104,142 @@ export const CONFIG = {
     }
   },
 
-  // PERSPECTIVE-STYLE QUESTIONS
+  // QUESTIONS & DYNAMIC BRANCHING LOGIC
   questions: [
-    // PAGE 1 / QUESTION 1: The Goal & Vibe (Perspective Product Finder DNA - No Location Leakage)
+    // PAGE 1 / QUESTION 1: Financial Interest Qualification
     {
       id: "q1",
       stepNumber: 1,
       totalSteps: 4,
-      title: "What is most important to you in your next acquisition?",
-      subtitle: "Choose the option that describes your vision best:",
+      title: "Are you financially interested in the Navy Estate, Apo?",
+      subtitle: "Choose an option below to check eligibility, plot sizes and opening offer rates:",
       options: [
         {
-          id: "opt_luxury",
-          title: "Luxury Living & Prestige",
-          subtitle: "Build an upscale family landmark in a secure, prime enclave.",
-          image: "/eminence-villa.jpg",
-          color: "bg-[#D9483B]", // Warm coral red like Perspective
-          targetEstate: "EMINENCE_VILLA"
-        },
-        {
-          id: "opt_growth",
-          title: "High Capital Growth (50%+)",
-          subtitle: "Lock in pre-hike rates before imminent price surge.",
+          id: "opt_yes",
+          title: "Yes",
+          buttonLabel: "Yes, I Am Interested",
+          shortTag: "Explore Allocation & Opening Rates",
+          subtitle: "I want to build, secure for my family or hold as a high-value long-term asset in Apo.",
           image: "/innovation-city.jpg",
-          color: "bg-[#C48824]", // Warm amber gold like Perspective
+          color: "bg-[#0A2558]", // Rich NBCCL Navy
+          badge: "Opening Offer Active",
           targetEstate: "INNOVATION_CITY"
         },
         {
-          id: "opt_banking",
-          title: "Affordable Land Banking",
-          subtitle: "High-yield suburban growth with flexible payment terms.",
+          id: "opt_no",
+          title: "No",
+          buttonLabel: "No, Not At This Time",
+          shortTag: "General Information Only",
+          subtitle: "I am not actively looking to purchase or invest in Apo land right now.",
           image: "/mayfair-garden.jpg",
-          color: "bg-[#2E7D32]", // Rich emerald green like Perspective
-          targetEstate: "MAYFAIR_GARDEN"
+          color: "bg-[#475569]", // Muted Professional Slate
+          badge: "Inquiry Only",
+          targetEstate: "INNOVATION_CITY"
         }
       ]
     },
 
-    // QUESTION 2: Preferred District (Perspective Visual Cards)
+    // QUESTION 2: Category Branching (Military vs Civilian)
     {
       id: "q2",
       stepNumber: 2,
       totalSteps: 4,
-      title: "Which Abuja district do you feel most drawn to? 📍",
-      subtitle: "Select a preferred location or let us recommend the highest value:",
+      title: "Which category applies to you?",
+      subtitle: "Select your affiliation to unlock applicable allocation rates & subsidies:",
       options: [
-        { 
-          id: "loc_maitama", 
-          title: "Maitama 2", 
-          shortTag: "Prime Luxury Corridor",
-          subtitle: "Prime diplomatic & luxury residential corridor", 
-          targetEstate: "EMINENCE_VILLA", 
-          image: "/eminence-villa.jpg",
-          color: "bg-[#D9483B]"
+        {
+          id: "cat_military",
+          categoryKey: "MILITARY",
+          title: "I am a Military Personnel",
+          shortTag: "Subsidized Rates",
+          subtitle: "Serving or retired Armed Forces personnel eligible for statutory development subsidies.",
+          image: "/military-avatar.jpg",
+          color: "bg-[#0A2558]",
+          badge: "Military Subsidized"
         },
-        { 
-          id: "loc_apo", 
-          title: "Apo [The Parliament]", 
-          shortTag: "High Capital Growth",
-          subtitle: "Fast-appreciating central investment corridor", 
-          targetEstate: "INNOVATION_CITY", 
-          image: "/innovation-city.jpg",
-          color: "bg-[#C48824]"
-        },
-        { 
-          id: "loc_karsana", 
-          title: "Karsana", 
-          shortTag: "Smart Land Banking",
-          subtitle: "Rapid suburban growth behind Efab Metropolis", 
-          targetEstate: "MAYFAIR_GARDEN", 
-          image: "/mayfair-garden.jpg",
-          color: "bg-[#2E7D32]"
-        },
-        { 
-          id: "loc_any", 
-          title: "Recommend Best Value", 
-          shortTag: "Highest ROI Match",
-          subtitle: "Match me with the highest ROI plot for my budget", 
-          targetEstate: "AUTO", 
-          image: "/abuja-recommend.jpg",
-          icon: "🧭",
-          color: "bg-[#1E293B]"
+        {
+          id: "cat_civilian",
+          categoryKey: "CIVILIAN",
+          title: "I am a Civilian",
+          shortTag: "Civilian Approved Plots",
+          subtitle: "Open to business executives, civil servants, private investors & the diaspora.",
+          image: "/civilian-avatar.jpg",
+          color: "bg-[#185ADB]",
+          badge: "Open Allocation"
         }
       ]
     },
 
-    // QUESTION 3: Budget Range (Perspective Visual Cards)
+    // QUESTION 3: Plot Sizes & Pricing (Dynamic Branching)
     {
       id: "q3",
       stepNumber: 3,
       totalSteps: 4,
-      title: "What is your target budget comfort zone? 💰",
-      subtitle: "This matches you with the ideal plot size & building type:",
-      options: [
-        { 
-          id: "b_10_15", 
-          title: "₦9.5M – ₦15M", 
-          shortTag: "150–170 SQM Starter",
-          subtitle: "Starter terrace & entry land banking (150–170 SQM)", 
-          tier: "ENTRY",
-          icon: "🌱",
-          color: "bg-[#2E7D32]"
-        },
-        { 
-          id: "b_15_35", 
-          title: "₦15M – ₦35M", 
-          shortTag: "250–350 SQM Mid-Tier",
-          subtitle: "Semi-detached & residential plots (250–350 SQM)", 
-          tier: "MID",
-          icon: "🏡",
-          color: "bg-[#2563EB]"
-        },
-        { 
-          id: "b_35_70", 
-          title: "₦35M – ₦70M", 
-          shortTag: "500–1,200 SQM Luxury",
-          subtitle: "Detached duplexes, penthouses & flats (500–1200 SQM)", 
-          tier: "LUXURY",
-          icon: "🏛️",
-          color: "bg-[#C48824]"
-        },
-        { 
-          id: "b_70_plus", 
-          title: "₦70M – ₦350M+", 
-          shortTag: "Commercial & Mansions",
-          subtitle: "Commercial blocks & large multi-plot estates", 
-          tier: "ULTRA",
-          icon: "💎",
-          color: "bg-[#7C3AED]"
-        }
+      title: "Which plot size are you interested in?",
+      subtitle: "Select your target plot size and building type for Navy Estate Innovation City:",
+      // Subsidized Military Pricing Options
+      militaryOptions: [
+        { id: "plot_m_170", size: "170 SQM", price: "₦9.5M", title: "170 SQM (₦9.5M)", shortTag: "Terrace Duplex Plot", subtitle: "Subsidized plot for 3-4 bedroom terrace duplex", icon: "🏛️", color: "bg-[#0A2558]", badge: "Military Rate" },
+        { id: "plot_m_250", size: "250 SQM", price: "₦13.5M", title: "250 SQM (₦13.5M)", shortTag: "Semi-Detached Duplex", subtitle: "Subsidized plot for 4-bedroom semi-detached duplex", icon: "🏡", color: "bg-[#0A2558]", badge: "Most Popular" },
+        { id: "plot_m_450", size: "450 SQM", price: "₦22.3M", title: "450 SQM (₦22.3M)", shortTag: "Fully Detached Duplex", subtitle: "Subsidized plot for 4-5 bedroom detached duplex with BQ", icon: "💎", color: "bg-[#0A2558]", badge: "Military Rate" },
+        { id: "plot_m_600", size: "600 SQM", price: "₦29.5M", title: "600 SQM (₦29.5M)", shortTag: "Luxury Detached Duplex", subtitle: "Subsidized plot for 5-bedroom luxury duplex + private pool", icon: "🌟", color: "bg-[#0A2558]", badge: "Military Rate" },
+        { id: "plot_m_850", size: "850 SQM", price: "₦41.5M", title: "850 SQM (₦41.5M)", shortTag: "Executive Mansion", subtitle: "Subsidized prime plot for palatial residence / ambassadorial home", icon: "👑", color: "bg-[#0A2558]", badge: "Military Rate" },
+        { id: "plot_m_1200", size: "1200 SQM", price: "₦57.5M", title: "1200 SQM (₦57.5M)", shortTag: "Block of Flats / Estate", subtitle: "Subsidized high-density plot for block of residential apartments", icon: "🏢", color: "bg-[#0A2558]", badge: "Military Rate" }
+      ],
+      // Approved Civilian Pricing Options
+      civilianOptions: [
+        { id: "plot_c_170", size: "170 SQM", price: "₦12M", title: "170 SQM (₦12M)", shortTag: "Terrace Duplex Plot", subtitle: "Approved plot for 3-4 bedroom terrace duplex", icon: "🏛️", color: "bg-[#185ADB]", badge: "Civilian Approved" },
+        { id: "plot_c_250", size: "250 SQM", price: "₦16M", title: "250 SQM (₦16M)", shortTag: "Semi-Detached Duplex", subtitle: "Approved plot for 4-bedroom semi-detached duplex", icon: "🏡", color: "bg-[#185ADB]", badge: "Most Popular" },
+        { id: "plot_c_450", size: "450 SQM", price: "₦24.8M", title: "450 SQM (₦24.8M)", shortTag: "Fully Detached Duplex", subtitle: "Approved plot for 4-5 bedroom detached duplex with BQ", icon: "💎", color: "bg-[#185ADB]", badge: "Civilian Approved" },
+        { id: "plot_c_600", size: "600 SQM", price: "₦32M", title: "600 SQM (₦32M)", shortTag: "Luxury Detached Duplex", subtitle: "Approved plot for 5-bedroom luxury duplex + private pool", icon: "🌟", color: "bg-[#185ADB]", badge: "Civilian Approved" },
+        { id: "plot_c_850", size: "850 SQM", price: "₦44M", title: "850 SQM (₦44M)", shortTag: "Executive Mansion", subtitle: "Approved prime plot for palatial residence / ambassadorial home", icon: "👑", color: "bg-[#185ADB]", badge: "Civilian Approved" },
+        { id: "plot_c_1200", size: "1200 SQM", price: "₦60M", title: "1200 SQM (₦60M)", shortTag: "Block of Flats / Estate", subtitle: "Approved high-density plot for block of residential apartments", icon: "🏢", color: "bg-[#185ADB]", badge: "Civilian Approved" }
       ]
     },
 
-    // QUESTION 4: Payment Terms Preference (Perspective Visual Cards with Elite Imagery)
+    // QUESTION 4: Inspection & Visit Availability
     {
       id: "q4",
       stepNumber: 4,
       totalSteps: 4,
-      title: "What payment structure works best for you? ⏱️",
-      subtitle: "All options qualify for September Speciale promotional perks:",
+      title: "When will you be available for inspection or visit to our office?",
+      subtitle: "Select your preferred timeline for a guided site tour or office visit at Asokoro:",
       options: [
-        { 
-          id: "pay_outright", 
-          title: "Outright Payment", 
-          shortTag: "Highest Promo Discount",
-          subtitle: "Instant allocation pass & highest promo price discount", 
-          badge: "Max Discount",
-          image: "/q4-outright.jpg",
-          color: "bg-[#D9483B]"
+        {
+          id: "insp_this_week",
+          title: "This Week",
+          shortTag: "Monday – Friday",
+          subtitle: "Available for on-site inspection or office consultation this week",
+          icon: "📅",
+          color: "bg-[#0A2558]",
+          badge: "Fast Track"
         },
-        { 
-          id: "pay_3_6", 
-          title: "3 to 6 Months", 
-          shortTag: "30%–50% Deposit",
-          subtitle: "30%–50% initial deposit with balance spread conveniently", 
-          badge: "Most Popular",
-          image: "/q4-spread-3-6.jpg",
-          color: "bg-[#C48824]"
+        {
+          id: "insp_this_weekend",
+          title: "This Weekend",
+          shortTag: "Saturday / Sunday",
+          subtitle: "Weekend inspection tour with NBCCL project consultants",
+          icon: "☀️",
+          color: "bg-[#0A2558]",
+          badge: "Weekend Slot"
         },
-        { 
-          id: "pay_12", 
-          title: "12 Months Spread", 
-          shortTag: "Zero Pressure",
-          subtitle: "Comfortable quarterly or monthly installments", 
-          badge: "Zero Pressure",
-          image: "/q4-zero-pressure.jpg",
-          color: "bg-[#2563EB]"
+        {
+          id: "insp_next_week",
+          title: "Next Week",
+          shortTag: "Flexible Schedule",
+          subtitle: "Planning ahead for a convenient visit during next week",
+          icon: "🗓️",
+          color: "bg-[#185ADB]",
+          badge: "Upcoming"
         },
-        { 
-          id: "pay_custom", 
-          title: "Custom Milestone", 
-          shortTag: "Bespoke Inflow Terms",
-          subtitle: "Bespoke schedule tailored to your cashflow with our advisor", 
-          badge: "Bespoke Terms",
-          image: "/q4-custom-milestone.jpg",
-          color: "bg-[#1E293B]"
+        {
+          id: "insp_outside_abuja",
+          title: "I am Outside Abuja / Overseas",
+          shortTag: "Virtual Inspection",
+          subtitle: "Request video walkthrough, cadastral layout docs & digital consultation",
+          icon: "✈️",
+          color: "bg-[#1E293B]",
+          badge: "Diaspora / Remote"
         }
       ]
     }

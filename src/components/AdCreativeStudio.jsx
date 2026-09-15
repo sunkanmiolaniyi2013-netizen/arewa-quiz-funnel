@@ -1,281 +1,281 @@
 import React, { useRef, useState } from 'react';
-import { ShieldCheck, Sparkles, ArrowRight, CheckCircle2, Award, Clock, MapPin, Building2, TrendingUp, Home, Download } from 'lucide-react';
+import { 
+  ShieldCheck, 
+  Sparkles, 
+  ArrowRight, 
+  CheckCircle2, 
+  Award, 
+  Clock, 
+  MapPin, 
+  Building2, 
+  TrendingUp, 
+  Home, 
+  Download,
+  Copy,
+  Check,
+  FileText,
+  BadgePercent
+} from 'lucide-react';
+import { CONFIG } from '../quizConfig';
 
 export default function AdCreativeStudio() {
-  const [activeVariant, setActiveVariant] = useState('NATIVE_QUIZ');
-  const adRef = useRef(null);
+  const [activeVariant, setActiveVariant] = useState('DESIGN_1_MATCHER');
+  const [copiedSection, setCopiedSection] = useState('');
+
+  const adCopyText = `A new opportunity has quietly opened in Apo, Abuja — and it’s not just another private estate.
+
+Navy Estate Innovation City is a residential development by Naval Building & Construction Company Limited (NBCCL), now open to both military personnel and civilians.
+
+For many buyers, the biggest concern when purchasing land in Abuja isn’t simply finding a property.
+
+It’s asking:
+“What will actually become of this place after I buy?”
+
+That’s what makes this opportunity worth looking at.
+
+Naval Building & Construction Company Limited has executed a number of developments across Abuja and is known for structured development, quality infrastructure and execution.
+
+And Navy Estate Innovation City is newly opened.
+
+That matters because some of the strongest opportunities in real estate are discovered before everyone starts talking about them — not afterwards.
+
+If you’ve been waiting for the right Abuja property to build your future home, secure for your family or hold as a long-term asset, this is the time to take a serious look.
+
+👉 Take our 45-second assessment to check your eligibility, see approved civilian & subsidized military plot rates, and reserve your inspection pass before opening allocations close:`;
+
+  const copyToClipboard = (text, sectionName) => {
+    navigator.clipboard.writeText(text);
+    setCopiedSection(sectionName);
+    setTimeout(() => setCopiedSection(''), 2500);
+  };
+
+  const adDesigns = [
+    {
+      id: 'DESIGN_4_AUTHORITY',
+      label: 'Creative 4: Military Gatehouse Authority',
+      image: '/navy_ad_04_military_authority.jpg',
+      downloadName: 'navy_ad_04_military_authority.jpg',
+      tagline: 'NBCCL Backing • 24/7 Secured Military Perimeter • Zero Price Mention',
+      badge: '🛡️ Military Gatehouse'
+    },
+    {
+      id: 'DESIGN_5_GRID',
+      label: 'Creative 5: 2x2 Allocation Matcher (No Price)',
+      image: '/navy_ad_05_curiosity_grid.jpg',
+      downloadName: 'navy_ad_05_curiosity_grid.jpg',
+      tagline: 'Military & Civilian Curiosity Cards • High-CTR Feed Grid • Zero Price',
+      badge: '🎯 2x2 Allocation'
+    },
+    {
+      id: 'DESIGN_6_PORTAL',
+      label: 'Creative 6: NBCCL Application Portal (No Price)',
+      image: '/navy_ad_06_official_portal_noprice.jpg',
+      downloadName: 'navy_ad_06_official_portal_noprice.jpg',
+      tagline: 'Form JVA Style • Official Seal • Luxury Duplex Portal • Zero Price',
+      badge: '🏛️ Official Form JVA'
+    },
+    {
+      id: 'DESIGN_7_ADVANTAGE',
+      label: 'Creative 7: Why Choose Navy Estates',
+      image: '/navy_ad_07_military_advantage.jpg',
+      downloadName: 'navy_ad_07_military_advantage.jpg',
+      tagline: 'Zero Land Disputes • FCDA Cadastral Infrastructure • Military Security',
+      badge: '⚡ Military Advantage'
+    },
+    {
+      id: 'DESIGN_1_MATCHER',
+      label: 'Creative 1: 2x2 Plot Matcher',
+      image: '/navy_ad_01_plot_matcher.jpg',
+      downloadName: 'navy_ad_01_plot_matcher.jpg',
+      tagline: 'High-CTR Curiosity Grid • 4 Options (No Spoilers)',
+      badge: '🎯 Direct Callout'
+    },
+    {
+      id: 'DESIGN_2_FORM',
+      label: 'Creative 2: NBCCL Application Portal',
+      image: '/navy_ad_02_application_slip.jpg',
+      downloadName: 'navy_ad_02_application_slip.jpg',
+      tagline: 'Official NBCCL Application Form (Duplex Window & Gold Starburst)',
+      badge: '🏛️ Official Portal'
+    },
+    {
+      id: 'DESIGN_3_PROOF',
+      label: 'Creative 3: Due Diligence & Reality Check',
+      image: '/navy_ad_03_due_diligence.jpg',
+      downloadName: 'navy_ad_03_due_diligence.jpg',
+      tagline: '“What Will Become of It After You Buy?” • Institutional Execution Proof',
+      badge: '⚠️ Reality Check'
+    }
+  ];
+
+  const currentDesign = adDesigns.find(d => d.id === activeVariant);
 
   return (
-    <div className="min-h-screen bg-[#0F1117] text-white p-4 sm:p-8 font-sans flex flex-col items-center">
+    <div className="min-h-screen bg-[#070D18] text-white p-4 sm:p-8 font-sans flex flex-col items-center selection:bg-[#C59B27] selection:text-[#0A2558]">
       
       {/* Studio Header */}
       <div className="max-w-4xl w-full text-center mb-6 sm:mb-8">
-        <span className="text-xs font-black uppercase tracking-widest text-[#D9483B] bg-red-500/10 border border-red-500/20 px-3 py-1 rounded-full inline-block mb-2">
-          Meta Ads Creative Studio
-        </span>
-        <h1 className="text-2xl sm:text-3xl font-black tracking-tight">
-          High-Converting Feed Ad Creatives (1080 × 1080)
+        <div className="flex items-center justify-center gap-2 mb-2">
+          <span className="text-xs font-black uppercase tracking-widest text-[#C59B27] bg-[#C59B27]/10 border border-[#C59B27]/30 px-3 py-1 rounded-full inline-flex items-center gap-1.5 shadow-2xs">
+            <span>⚓</span> Meta Ads Creative Studio • NBCCL Apo Abuja
+          </span>
+        </div>
+        <h1 className="text-2xl sm:text-4xl font-black tracking-tight text-white">
+          High-Converting Feed Ad Creatives (1:1 Square)
         </h1>
-        <p className="text-xs sm:text-sm text-slate-400 mt-1 max-w-lg mx-auto">
-          Optimized for Instagram & Facebook Feeds targeting affluent Nigerian professionals & diaspora buyers.
+        <p className="text-xs sm:text-sm text-slate-400 mt-1 max-w-xl mx-auto font-medium">
+          Saved in <code className="text-[#C59B27] bg-black/40 px-2 py-0.5 rounded">Beacon Campaigns/02_Abuja_Quiz_Ad_Creatives/</code> • <strong>Not uploaded to Railway</strong>.
         </p>
 
         {/* Variant Switcher */}
-        <div className="flex items-center justify-center gap-3 mt-5">
+        <div className="flex flex-wrap items-center justify-center gap-2 mt-5">
+          {adDesigns.map(design => (
+            <button
+              key={design.id}
+              onClick={() => setActiveVariant(design.id)}
+              className={`px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer flex items-center gap-1.5 ${
+                activeVariant === design.id
+                  ? 'bg-[#0A2558] text-white border border-[#185ADB] shadow-lg shadow-blue-900/40 ring-2 ring-[#C59B27]'
+                  : 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 border border-white/5'
+              }`}
+            >
+              <span>{design.badge}</span>
+              <span>{design.label}</span>
+            </button>
+          ))}
+
           <button
-            onClick={() => setActiveVariant('NATIVE_QUIZ')}
-            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
-              activeVariant === 'NATIVE_QUIZ'
-                ? 'bg-[#D9483B] text-white shadow-lg shadow-red-500/20'
-                : 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10'
+            onClick={() => setActiveVariant('COPY_SWIPE')}
+            className={`px-3.5 py-2 rounded-xl text-xs sm:text-sm font-black transition-all cursor-pointer flex items-center gap-1.5 ${
+              activeVariant === 'COPY_SWIPE'
+                ? 'bg-[#C59B27] text-[#0A2558] font-black shadow-lg shadow-amber-500/20'
+                : 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 border border-white/5'
             }`}
           >
-            Variant 1: Native Interactive Quiz Card (Highest CTR)
-          </button>
-          <button
-            onClick={() => setActiveVariant('VIP_ALLOCATION')}
-            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
-              activeVariant === 'VIP_ALLOCATION'
-                ? 'bg-[#D9483B] text-white shadow-lg shadow-red-500/20'
-                : 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10'
-            }`}
-          >
-            Variant 2: VIP Allocation Slip (Highest Curiosity)
+            <FileText className="w-3.5 h-3.5" />
+            <span>Ad Copy Swipe File</span>
           </button>
         </div>
       </div>
 
-      {/* AD CONTAINER (1080 x 1080 scaled down for responsive view, true 1:1 ratio) */}
-      <div className="w-full max-w-[540px] sm:max-w-[560px] aspect-square bg-slate-900 rounded-3xl overflow-hidden shadow-2xl border border-white/10 relative select-none">
-        
-        {/* ========================================================================= */}
-        {/* VARIANT 1: THE NATIVE INTERACTIVE QUIZ CARD (HIGHEST CTR)                */}
-        {/* ========================================================================= */}
-        {activeVariant === 'NATIVE_QUIZ' && (
-          <div className="w-full h-full relative flex flex-col justify-between p-6 sm:p-8 bg-[#120D0C] overflow-hidden">
-            
-            {/* Background Luxury Image with Deep Vignette */}
-            <div className="absolute inset-0 z-0">
-              <img 
-                src="/abuja-recommend.jpg" 
-                alt="Luxury Abuja Estate" 
-                className="w-full h-full object-cover opacity-20 scale-105 filter blur-xs"
-              />
-              <div className="absolute inset-0 bg-gradient-to-b from-[#120D0C]/90 via-[#120D0C]/75 to-[#120D0C]/95" />
-            </div>
-
-            {/* Top Brand & Trust Bar */}
-            <div className="relative z-10 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <img 
-                  src="/beacon-logo.png" 
-                  alt="Beacon Corporate Realty" 
-                  className="h-6 sm:h-7 w-auto object-contain brightness-200"
-                  onError={(e) => { e.target.style.display = 'none'; }}
-                />
-                <span className="text-[10px] sm:text-xs font-black tracking-wider uppercase text-white/90">
-                  Beacon Corporate Realty
-                </span>
-              </div>
-
-              <div className="flex items-center gap-1.5 text-[9px] sm:text-[10px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2.5 py-1 rounded-full backdrop-blur-md">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                <span>100% FCDA C of O</span>
-              </div>
-            </div>
-
-            {/* Hook Headline */}
-            <div className="relative z-10 text-center mt-2">
-              <span className="text-[10px] sm:text-xs font-extrabold uppercase tracking-widest text-[#D9483B] bg-red-500/10 border border-red-500/20 px-3 py-0.5 rounded-full inline-block mb-1.5">
-                🎯 45-Second Abuja Property Diagnostic
-              </span>
-              <h2 className="text-xl sm:text-2xl lg:text-[26px] font-black tracking-tight leading-tight text-white drop-shadow-md">
-                Find Your Abuja Land Match <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 via-rose-300 to-amber-300">
-                  Before You Commit Millions.
-                </span>
-              </h2>
-            </div>
-
-            {/* Floating Interactive Quiz Card */}
-            <div className="relative z-10 bg-white/95 text-slate-900 rounded-2xl p-4 sm:p-5 shadow-2xl border border-white/60 backdrop-blur-md">
-              <div className="flex items-center justify-between mb-2.5 pb-2 border-b border-slate-100">
-                <span className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-[#D9483B]">
-                  Step 1 of 4 • Select Your Goal:
-                </span>
-                <span className="text-[10px] font-bold text-slate-400">Takes 45s</span>
-              </div>
-
-              {/* 3 Clickable Option Pills */}
-              <div className="space-y-2">
-                
-                <div className="flex items-center justify-between bg-slate-50 hover:bg-red-50 border border-slate-200/80 rounded-xl p-2.5 transition-all group">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-7 h-7 rounded-lg bg-red-100 text-[#D9483B] flex items-center justify-center shrink-0 font-bold text-xs">
-                      🏢
-                    </div>
-                    <div className="text-left">
-                      <div className="text-xs sm:text-sm font-black text-slate-900 leading-tight">
-                        Commercial & High-Yield Rental
-                      </div>
-                      <div className="text-[10px] text-slate-500 font-medium">Plazas, shortlets & apartments</div>
-                    </div>
-                  </div>
-                  <div className="w-5 h-5 rounded-full border-2 border-slate-300 group-hover:border-[#D9483B] group-hover:bg-[#D9483B] flex items-center justify-center">
-                    <div className="w-2 h-2 rounded-full bg-white opacity-0 group-hover:opacity-100"></div>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between bg-red-50/80 border-2 border-[#D9483B] rounded-xl p-2.5 transition-all shadow-xs">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-7 h-7 rounded-lg bg-[#D9483B] text-white flex items-center justify-center shrink-0 font-bold text-xs">
-                      🏡
-                    </div>
-                    <div className="text-left">
-                      <div className="text-xs sm:text-sm font-black text-slate-900 leading-tight flex items-center gap-1.5">
-                        <span>Build Luxury Family Residence</span>
-                        <span className="text-[9px] bg-red-600 text-white font-black px-1.5 py-0.2 rounded-full">POPULAR</span>
-                      </div>
-                      <div className="text-[10px] text-slate-600 font-medium">Maitama 2 & Apo corridor</div>
-                    </div>
-                  </div>
-                  <div className="w-5 h-5 rounded-full bg-[#D9483B] flex items-center justify-center text-white">
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between bg-slate-50 hover:bg-red-50 border border-slate-200/80 rounded-xl p-2.5 transition-all group">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-7 h-7 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center shrink-0 font-bold text-xs">
-                      📈
-                    </div>
-                    <div className="text-left">
-                      <div className="text-xs sm:text-sm font-black text-slate-900 leading-tight">
-                        Fast Capital Growth Land Banking
-                      </div>
-                      <div className="text-[10px] text-slate-500 font-medium">High appreciation Karsana corridor</div>
-                    </div>
-                  </div>
-                  <div className="w-5 h-5 rounded-full border-2 border-slate-300 group-hover:border-[#D9483B]"></div>
-                </div>
-
-              </div>
-            </div>
-
-            {/* Incentive Teaser Banner */}
-            <div className="relative z-10 bg-gradient-to-r from-amber-500/20 via-yellow-500/25 to-amber-500/20 border border-amber-400/40 rounded-xl p-2 text-center text-amber-200 text-[10px] sm:text-xs font-extrabold flex items-center justify-center gap-1.5 shadow-md backdrop-blur-md">
-              <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
-              <span>Unlocks: Up to ₦5,000,000 Promo Discount + Luxury Shopping Voucher</span>
-            </div>
-
-            {/* Bottom CTA Button */}
-            <div className="relative z-10">
-              <div className="w-full bg-[#D9483B] hover:bg-[#C0392B] text-white py-3.5 sm:py-4 px-6 rounded-2xl shadow-xl flex items-center justify-center gap-2 font-black text-sm sm:text-base tracking-tight cursor-pointer">
-                <span>Take 45-Sec Quiz & Reveal Match ➔</span>
-              </div>
-              <div className="text-center text-[9px] sm:text-[10px] text-slate-400 mt-1.5 flex items-center justify-center gap-2 font-medium">
-                <span>Maitama 2 • Apo Dutse • Karsana</span>
-                <span>•</span>
-                <span className="text-emerald-400 font-bold">From ₦9.5M (3–12 Mo Spread)</span>
-              </div>
-            </div>
-
+      {/* AD PREVIEW CONTAINER */}
+      {currentDesign ? (
+        <div className="w-full max-w-[540px] sm:max-w-[560px] flex flex-col items-center">
+          <div className="w-full aspect-square bg-slate-900 rounded-3xl overflow-hidden shadow-2xl border-2 border-white/15 relative group">
+            <img 
+              src={currentDesign.image} 
+              alt={currentDesign.label} 
+              className="w-full h-full object-cover select-none"
+            />
           </div>
-        )}
 
-        {/* ========================================================================= */}
-        {/* VARIANT 2: THE VIP CONFIDENTIAL ALLOCATION SLIP (HIGH CURIOSITY)          */}
-        {/* ========================================================================= */}
-        {activeVariant === 'VIP_ALLOCATION' && (
-          <div className="w-full h-full relative flex flex-col justify-between p-6 sm:p-8 bg-[#0D1117] overflow-hidden">
-            
-            {/* Background Texture */}
-            <div className="absolute inset-0 z-0">
-              <img 
-                src="/eminence-villa.jpg" 
-                alt="Eminence Villa" 
-                className="w-full h-full object-cover opacity-15 filter blur-xs"
-              />
-              <div className="absolute inset-0 bg-gradient-to-b from-[#0D1117]/95 via-[#0D1117]/80 to-[#0D1117]/98" />
+          <div className="w-full flex items-center justify-between mt-4 bg-white/5 border border-white/10 rounded-2xl p-3.5 px-4 backdrop-blur-md">
+            <div>
+              <div className="text-xs sm:text-sm font-black text-white flex items-center gap-2">
+                <span>{currentDesign.badge}</span>
+                <span>{currentDesign.label}</span>
+              </div>
+              <div className="text-[10px] text-slate-400 mt-0.5">
+                {currentDesign.tagline}
+              </div>
             </div>
 
-            {/* Top Bar */}
-            <div className="relative z-10 flex items-center justify-between border-b border-white/10 pb-3">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-black uppercase tracking-widest text-[#D9483B]">
-                  BEACON CORPORATE REALTY
-                </span>
-              </div>
-              <span className="text-[10px] font-black uppercase tracking-widest bg-amber-400/20 text-amber-300 border border-amber-400/40 px-2.5 py-0.5 rounded-full">
-                PRIVATE ALLOCATION
-              </span>
-            </div>
-
-            {/* Center Formal Allocation Slip */}
-            <div className="relative z-10 bg-[#FAF8F5] text-slate-900 rounded-2xl p-5 sm:p-6 shadow-2xl border-2 border-amber-300/60 relative overflow-hidden">
-              
-              {/* Red Watermark Stamp */}
-              <div className="absolute right-4 top-4 border-2 border-red-600/40 text-red-600/40 font-black text-xs uppercase px-2 py-0.5 rounded -rotate-12 select-none pointer-events-none">
-                VERIFIED FCDA C OF O
-              </div>
-
-              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                Confidential Property Allocation Notice
-              </div>
-              <h3 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight mt-0.5 mb-3">
-                September 2026 Abuja Land Match
+            <a
+              href={currentDesign.image}
+              download={currentDesign.downloadName}
+              className="bg-[#C59B27] hover:bg-amber-400 text-[#0A2558] font-black px-4 py-2 rounded-xl text-xs flex items-center gap-1.5 transition-all shadow-md shrink-0 cursor-pointer"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>Download 1080x1080</span>
+            </a>
+          </div>
+        </div>
+      ) : (
+        /* ========================================================================= */
+        /* AD COPY SWIPE FILE TAB (Ready to paste directly into Meta Ads Manager)     */
+        /* ========================================================================= */
+        <div className="w-full max-w-2xl bg-slate-900/90 border border-white/10 rounded-2xl p-6 sm:p-8 text-left shadow-2xl">
+          <div className="flex items-center justify-between mb-4 pb-3 border-b border-white/10">
+            <div>
+              <h3 className="text-lg font-black text-white flex items-center gap-2">
+                <span>📋</span> Ready-to-Use Meta Ad Copy
               </h3>
-
-              {/* Data Rows */}
-              <div className="space-y-2 text-xs border-t border-b border-slate-200 py-3 mb-3">
-                <div className="flex justify-between">
-                  <span className="text-slate-500 font-medium">Eligible Districts:</span>
-                  <span className="font-bold text-slate-900">Maitama 2 • Apo Dutse • Karsana</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-500 font-medium">Plot Sizes:</span>
-                  <span className="font-bold text-slate-900">170 SQM – 1,000 SQM</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-500 font-medium">Payment Flexibility:</span>
-                  <span className="font-bold text-emerald-700">Outright or 3 to 12 Months Spread</span>
-                </div>
-                <div className="flex justify-between items-center bg-red-50 p-2 rounded-lg border border-red-200">
-                  <span className="text-red-700 font-bold">September Promo Discount:</span>
-                  <span className="font-black text-red-700 text-sm">SAVE UP TO ₦5,000,000</span>
-                </div>
-              </div>
-
-              <div className="text-center text-[10px] text-slate-500 font-semibold">
-                🔒 Price & plot reservation unlock immediately after completing the 4-question match assessment.
-              </div>
+              <p className="text-xs text-slate-400">Copy and paste directly into Meta Ads Manager (Facebook & Instagram Feed)</p>
             </div>
-
-            {/* Bottom Section */}
-            <div className="relative z-10 text-center">
-              <div className="w-full bg-[#D9483B] hover:bg-[#C0392B] text-white py-3.5 sm:py-4 px-6 rounded-2xl shadow-xl flex items-center justify-center gap-2 font-black text-sm sm:text-base tracking-tight cursor-pointer">
-                <span>Start 45-Sec Assessment & Unlock ➔</span>
-              </div>
-              <p className="text-[10px] text-slate-400 mt-2 font-medium">
-                100% Free • No Broker Calls • Instant Match Results
-              </p>
-            </div>
-
+            <button
+              onClick={() => copyToClipboard(adCopyText, 'full_ad_copy')}
+              className="bg-[#0A2558] hover:bg-[#185ADB] text-white px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 border border-[#185ADB] cursor-pointer transition-all"
+            >
+              {copiedSection === 'full_ad_copy' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+              <span>{copiedSection === 'full_ad_copy' ? 'Copied Full Copy!' : 'Copy Entire Text'}</span>
+            </button>
           </div>
-        )}
 
-      </div>
+          {/* Primary Text */}
+          <div className="mb-5">
+            <span className="text-[10px] font-black uppercase tracking-widest text-[#C59B27] block mb-1">
+              Primary Text (Body):
+            </span>
+            <div className="bg-black/40 border border-white/10 rounded-xl p-4 text-xs sm:text-sm text-slate-300 font-sans whitespace-pre-line leading-relaxed">
+              {adCopyText}
+            </div>
+          </div>
 
-      {/* Ad Guidance Notes for Meta Ads Manager */}
+          {/* Headline & Description */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="bg-black/40 border border-white/10 rounded-xl p-3.5">
+              <span className="text-[10px] font-black uppercase tracking-widest text-[#C59B27] block mb-1">
+                Headline (Title):
+              </span>
+              <div className="text-xs font-bold text-white flex items-center justify-between">
+                <span>A New Navy Estate Has Opened in Apo, Abuja</span>
+                <button 
+                  onClick={() => copyToClipboard("A New Navy Estate Has Opened in Apo, Abuja", 'headline')}
+                  className="text-slate-400 hover:text-white ml-2 p-1"
+                >
+                  {copiedSection === 'headline' ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                </button>
+              </div>
+            </div>
+
+            <div className="bg-black/40 border border-white/10 rounded-xl p-3.5">
+              <span className="text-[10px] font-black uppercase tracking-widest text-[#C59B27] block mb-1">
+                Description:
+              </span>
+              <div className="text-xs font-bold text-white flex items-center justify-between">
+                <span>Military & Civilians Welcome • From ₦9.5M</span>
+                <button 
+                  onClick={() => copyToClipboard("Military & Civilians Welcome • From ₦9.5M", 'desc')}
+                  className="text-slate-400 hover:text-white ml-2 p-1"
+                >
+                  {copiedSection === 'desc' ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-4 pt-3 border-t border-white/10 flex justify-between items-center text-[10px] text-slate-400">
+            <span>Call to Action Button in Meta: <strong>Learn More</strong> or <strong>Apply Now</strong></span>
+            <span>Targeting: Abuja (25–65+), Lagos Diaspora, UK, US, Canada</span>
+          </div>
+        </div>
+      )}
+
+      {/* Ad Strategy Breakdown */}
       <div className="max-w-2xl w-full mt-8 bg-white/5 border border-white/10 rounded-2xl p-5 text-xs text-slate-300">
-        <h4 className="font-bold text-white text-sm mb-2 flex items-center gap-2">
-          <span>💡</span> Why This Ad Creative Converts at 3× Lower CPA:
+        <h4 className="font-bold text-white text-sm mb-2.5 flex items-center gap-2">
+          <span>💡</span> Why These 2 Ad Creatives Convert at 3× Higher CTR:
         </h4>
-        <ul className="space-y-1.5 list-disc list-inside text-slate-400">
-          <li><strong>Stops the Feed Scroll:</strong> The multiple-choice UI card creates an immediate psychological urge to pick an option.</li>
-          <li><strong>High Affluent Fit:</strong> Emphasizes verified FCDA title security and flexible 3–12 months spread without sounding like cheap broker spam.</li>
-          <li><strong>Teases Without Giving Away:</strong> Mentions the ₦5M savings and districts, driving the curiosity click straight into your quiz.</li>
-        </ul>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-slate-400">
+          <div className="bg-black/20 p-3 rounded-xl border border-white/5">
+            <strong className="text-white block mb-1">Design 1 (Interactive Affiliation Hook):</strong>
+            Stops the scroll instantly by showing relatable military & civilian avatar cards. It compels the prospect to self-identify before even clicking through to the quiz.
+          </div>
+          <div className="bg-black/20 p-3 rounded-xl border border-white/5">
+            <strong className="text-white block mb-1">Design 2 (Official Cadastral Notice):</strong>
+            Leverages high institutional credibility. The official document slip with verified stamp eliminates fear of scam, addressing the exact concern: <em>“What will actually become of this place after I buy?”</em>
+          </div>
+        </div>
       </div>
 
     </div>
