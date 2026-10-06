@@ -1,25 +1,34 @@
 export const CONFIG = {
   // Global Brand Setup
-  brandName: "Naval Building & Construction Company Limited",
-  brandShortName: "NBCCL",
-  developmentName: "Navy Estate Innovation City",
-  location: "Cadastral Zone, Apo, Abuja",
-  officeAddress: "Cluster C, Admiralty Estate, Navy Town Asokoro, FCT Abuja",
-  contactPhones: ["+234 703 829 2131", "+234 902 131 1681"],
-  contactEmail: "nbccl.ng@gmail.com",
-  formNumber: "JVA",
-  applicationFee: "₦30,000.00",
-  brandTagline: "Structured Development. Quality Infrastructure. Execution.",
-  quizTitle: "Navy Estate Innovation City Assessment",
+  brandName: "Beacon Corporate Realty Ltd",
+  brandShortName: "Beacon Realty",
+  developmentName: "Arewa Residences",
+  location: "New Millennium City, Kaduna",
+  officeAddress: "New Millennium City Corridor, Kaduna, Nigeria",
+  contactPhones: ["+234 803 000 0000", "+234 902 000 0000"],
+  contactEmail: "info@beaconrealty.ng",
+  websiteUrl: "https://www.beaconrealty.ng",
+  brandTagline: "Secure Your Tomorrow • Arewa Today, Greater Tomorrows.",
+  quizTitle: "Arewa Residences Presale Allocation Assessment",
   facebookPixelId: import.meta.env.VITE_FACEBOOK_PIXEL_ID || "",
   
+  // PRIMARY BRAND COLORS (Derived from Arewa Residences Flyer)
+  colors: {
+    primaryCrimson: "#B8001F", // Dominant deep crimson red
+    crimsonDark: "#8B0000",   // Dark blood red
+    crimsonLight: "#DC2626",  // Vibrant red accent
+    goldAccent: "#D4AF37",    // C of O metallic gold
+    charcoal: "#111827",      // Bold dark black/charcoal
+    backgroundLight: "#F8FAFC"
+  },
+
   // DIAGNOSIS STRATEGY
   diagnosisType: "PRODUCT_FINDER",
 
   // LEAD CAPTURE SETTINGS
   leadCaptureConfig: {
-    webhookUrl: "https://services.leadconnectorhq.com/hooks/aTC64ND4XQDWNEekVZeZ/webhook-trigger/e24b115a-a820-4efa-aa62-0ed423bf96c2",
-    ghlCalendarEmbedUrl: "https://api.leadconnectorhq.com/widget/bookings/vip-consultation-site-visitati",
+    webhookUrl: "https://services.leadconnectorhq.com/hooks/aTC64ND4XQDWNEekVZeZ/webhook-trigger/b5yTvVxuEUgAZG2ZCnxu",
+    ghlCalendarEmbedUrl: "https://api.leadconnectorhq.com/widget/bookings/arewa-residences-kaduna-inspec",
     whatsappSalesNumber: "2348030000000",
     fields: {
       name: { show: true, required: true },
@@ -28,80 +37,74 @@ export const CONFIG = {
     }
   },
 
-  // THE 3 ESTATES INVENTORY
-  estates: {
-    EMINENCE_VILLA: {
-      id: "EMINENCE_VILLA",
-      name: "Eminence Villa",
-      location: "Maitama 2, Abuja",
-      tagline: "Prestige. Location. Legacy. Own A Landmark.",
-      image: "/eminence-villa.jpg",
-      titleType: "FCDA C of O",
-      badgeText: "Ultra Luxury Enclave",
-      paymentTerms: "12 Months Payment Plan • 30% Initial Deposit",
-      promoDeadline: "Offer Closes 7th October 2026",
-      defaultPlot: "250 SQM Semi-Detached Plot",
-      defaultPrice: "₦14,000,000",
-      defaultMarketPrice: "₦18,000,000",
-      defaultSavings: "₦4,000,000",
-      defaultIncentive: "₦400,000 Luxury Shopping Voucher",
-      plots: [
-        { size: "170 SQM", promoPrice: "₦9.5M", marketPrice: "₦12.5M", voucher: "₦250,000 Voucher" },
-        { size: "250 SQM", promoPrice: "₦14M", marketPrice: "₦18M", voucher: "₦400,000 Voucher" },
-        { size: "350 SQM", promoPrice: "₦19.5M", marketPrice: "₦26M", voucher: "₦500,000 Voucher" },
-        { size: "600 SQM", promoPrice: "₦33M", marketPrice: "₦44M", voucher: "₦700,000 Voucher" },
-        { size: "1,000 SQM", promoPrice: "₦55M", marketPrice: "₦73.75M", voucher: "₦800,000 Voucher + 2-Night Luxury Getaway" },
-        { size: "5,000 SQM", promoPrice: "₦200M", marketPrice: "₦200M", voucher: "4-Night Stay at Kigali Marriott, Rwanda + $500 Voucher" },
-        { size: "10,000 SQM", promoPrice: "₦350M", marketPrice: "₦350M", voucher: "Luxury Trip to the Maldives + $1,000 Voucher" }
-      ]
-    },
-    INNOVATION_CITY: {
-      id: "INNOVATION_CITY",
-      name: "Navy Estate Innovation City",
-      location: "Cadastral Zone, Apo, Abuja",
-      developer: "Naval Building & Construction Company Limited (NBCCL)",
-      tagline: "Structured Development • Quality Infrastructure • Execution",
-      image: "/innovation-city.jpg",
-      titleType: "FCDA Cadastral Allocation",
-      badgeText: "Official Opening Offer",
-      paymentTerms: "Flexible Initial Deposit • Convenient Milestone Spread",
-      promoDeadline: "Opening Offer Limited Allocations",
-      defaultPlot: "250 SQM Semi-Detached Plot",
-      defaultPrice: "₦13,500,000",
-      defaultMarketPrice: "₦16,000,000",
-      defaultSavings: "₦2,500,000",
-      defaultIncentive: "Verified Allocation Pass + Guided Site Inspection Tour",
-      plots: [
-        { size: "170 SQM", militaryPrice: "₦9.5M", civilianPrice: "₦12M", buildingType: "Terrace Duplex" },
-        { size: "250 SQM", militaryPrice: "₦13.5M", civilianPrice: "₦16M", buildingType: "Semi-Detached Duplex" },
-        { size: "450 SQM", militaryPrice: "₦22.3M", civilianPrice: "₦24.8M", buildingType: "Fully Detached Duplex" },
-        { size: "600 SQM", militaryPrice: "₦29.5M", civilianPrice: "₦32M", buildingType: "Luxury Detached Duplex" },
-        { size: "850 SQM", militaryPrice: "₦41.5M", civilianPrice: "₦44M", buildingType: "Executive Mansion" },
-        { size: "1,200 SQM", militaryPrice: "₦57.5M", civilianPrice: "₦60M", buildingType: "Block of Flats / Apartments" }
-      ]
-    },
-    MAYFAIR_GARDEN: {
-      id: "MAYFAIR_GARDEN",
-      name: "Mayfair Garden",
-      location: "Behind Efab Metropolis, Karsana, Abuja",
-      tagline: "A Better Place To Belong • Secure Growth & High Returns",
-      image: "/mayfair-garden.jpg",
-      titleType: "FCDA C of O",
-      badgeText: "Smart Land Banking",
-      paymentTerms: "Outright Promo Price or 3 Months Payment Plan",
-      promoDeadline: "September Speciale Promo Price",
-      defaultPlot: "250 SQM Residential Plot",
-      defaultPrice: "₦20,000,000 Outright",
-      defaultMarketPrice: "₦30,000,000 Actual Value",
-      defaultSavings: "₦10,000,000",
-      defaultIncentive: "₦10,000,000 Instant Promo Discount + Allocation Pass",
-      plots: [
-        { size: "150 SQM", promoPrice: "₦12M Outright", planPrice: "₦15M (3 Mo)", actualPrice: "₦18M" },
-        { size: "250 SQM", promoPrice: "₦20M Outright", planPrice: "₦25M (3 Mo)", actualPrice: "₦30M" },
-        { size: "350 SQM", promoPrice: "₦28M Outright", planPrice: "₦35M (3 Mo)", actualPrice: "₦42M" },
-        { size: "500 SQM", promoPrice: "₦40M Outright", planPrice: "₦50M (3 Mo)", actualPrice: "₦60M" }
-      ]
-    }
+  // THE AREWA RESIDENCES CORE ESTATE PROFILE
+  estate: {
+    id: "AREWA_RESIDENCES",
+    name: "Arewa Residences",
+    location: "New Millennium City, Kaduna",
+    developer: "Beacon Corporate Realty Ltd",
+    tagline: "Buy & Build — Directly on a Tarred Road",
+    subTagline: "Arewa Today, Greater Tomorrows.",
+    image: "/arewa-estate-hero.jpg",
+    titleType: "C of O Title (KADGIS Verifiable)",
+    badgeText: "Presale Now Open • 50% Off",
+    paymentTerms: "Presale Outright or Flexible 3-Month Plan",
+    promoDeadline: "Strictly Limited to First 25 Presale Allocations",
+    defaultPlot: "250 SQM Semi-Detached Duplex",
+    defaultPrice: "₦5,500,000",
+    defaultMarketPrice: "₦11,000,000",
+    defaultSavings: "₦5,500,000 (50% Off)",
+    defaultIncentive: "Tarred Road Frontage + Instant C of O Allocation Pass",
+    plots: [
+      { 
+        id: "plot_170", 
+        size: "170 SQM", 
+        buildingType: "Terrace Duplex",
+        presaleOutright: "₦3.5M", 
+        threeMonthPlan: "₦4.5M", 
+        actualPrice: "₦7M",
+        savings: "₦3.5M (50% Equity)",
+        badge: "Lowest Entry",
+        icon: "🏛️",
+        highlight: "Ideal for 3-4 bedroom modern terrace home"
+      },
+      { 
+        id: "plot_250", 
+        size: "250 SQM", 
+        buildingType: "Semi-Detached Duplex",
+        presaleOutright: "₦5.5M", 
+        threeMonthPlan: "₦7.5M", 
+        actualPrice: "₦11M",
+        savings: "₦5.5M (50% Equity)",
+        badge: "Most Popular",
+        icon: "🏡",
+        highlight: "Perfect for 4-bedroom semi-detached family residence"
+      },
+      { 
+        id: "plot_450", 
+        size: "450 SQM", 
+        buildingType: "Detached Duplex",
+        presaleOutright: "₦9M", 
+        threeMonthPlan: "₦11M", 
+        actualPrice: "₦18M",
+        savings: "₦9M (50% Equity)",
+        badge: "Executive Plot",
+        icon: "💎",
+        highlight: "Prime plot for 5-bedroom luxury detached duplex with BQ"
+      },
+      { 
+        id: "plot_900", 
+        size: "900 SQM", 
+        buildingType: "Block of Flats",
+        presaleOutright: "₦18M", 
+        threeMonthPlan: "₦21M", 
+        actualPrice: "₦36M",
+        savings: "₦18M (50% Equity)",
+        badge: "High Cash Flow",
+        icon: "🏢",
+        highlight: "Commercial high-density plot for rental apartment building"
+      }
+    ]
   },
 
   // QUESTIONS & DYNAMIC BRANCHING LOGIC
@@ -111,89 +114,149 @@ export const CONFIG = {
       id: "q1",
       stepNumber: 1,
       totalSteps: 4,
-      title: "Are you financially interested in the Navy Estate, Apo?",
-      subtitle: "Choose an option below to check eligibility, plot sizes and opening offer rates:",
+      title: "Are you financially interested in securing a plot at Arewa Residences, New Millennium City?",
+      subtitle: "Choose an option below to check eligibility, plot sizes, and exclusive 50% presale rates:",
       options: [
         {
           id: "opt_yes",
           title: "Yes",
           buttonLabel: "Yes, I Am Interested",
-          shortTag: "Explore Allocation & Opening Rates",
-          subtitle: "I want to build, secure for my family or hold as a high-value long-term asset in Apo.",
-          image: "/innovation-city.jpg",
-          color: "bg-[#0A2558]", // Rich NBCCL Navy
-          badge: "Opening Offer Active",
-          targetEstate: "INNOVATION_CITY"
+          shortTag: "Explore Presale Allocation & 50% Off",
+          subtitle: "I want to build immediately, secure a prime family residence, or lock in high-growth capital equity in New Millennium City.",
+          image: "/arewa-estate-hero.jpg",
+          color: "bg-gradient-to-r from-[#B8001F] to-[#8B0000]", // Rich Arewa Crimson
+          badge: "Presale Now Open",
+          targetEstate: "AREWA_RESIDENCES"
         },
         {
           id: "opt_no",
           title: "No",
           buttonLabel: "No, Not At This Time",
           shortTag: "General Information Only",
-          subtitle: "I am not actively looking to purchase or invest in Apo land right now.",
-          image: "/mayfair-garden.jpg",
-          color: "bg-[#475569]", // Muted Professional Slate
+          subtitle: "I am not actively looking to purchase or invest in Millennium City, Kaduna land right now.",
+          image: "/inquiry-consultant.jpg",
+          color: "bg-[#475569]", // Muted Slate
           badge: "Inquiry Only",
-          targetEstate: "INNOVATION_CITY"
+          targetEstate: "AREWA_RESIDENCES"
         }
       ]
     },
 
-    // QUESTION 2: Category Branching (Military vs Civilian)
+    // QUESTION 2: Primary Buyer Objective
     {
       id: "q2",
       stepNumber: 2,
       totalSteps: 4,
-      title: "Which category applies to you?",
-      subtitle: "Select your affiliation to unlock applicable allocation rates & subsidies:",
+      title: "What is your primary objective for acquiring land in New Millennium City?",
+      subtitle: "Select your acquisition profile to unlock tailored development terms & priority allocation:",
       options: [
         {
-          id: "cat_military",
-          categoryKey: "MILITARY",
-          title: "I am a Military Personnel",
-          shortTag: "Subsidized Rates",
-          subtitle: "Serving or retired Armed Forces personnel eligible for statutory development subsidies.",
-          image: "/military-avatar.jpg",
-          color: "bg-[#0A2558]",
-          badge: "Military Subsidized"
+          id: "obj_build",
+          objectiveKey: "BUY_AND_BUILD",
+          title: "Buy & Build (Family Residence)",
+          shortTag: "Directly on Tarred Road",
+          subtitle: "Ready to construct or secure a family home in a peaceful, secure, master-planned environment.",
+          icon: "🏡",
+          color: "bg-[#B8001F]",
+          badge: "Immediate Construction"
         },
         {
-          id: "cat_civilian",
-          categoryKey: "CIVILIAN",
-          title: "I am a Civilian",
-          shortTag: "Civilian Approved Plots",
-          subtitle: "Open to business executives, civil servants, private investors & the diaspora.",
-          image: "/civilian-avatar.jpg",
-          color: "bg-[#185ADB]",
-          badge: "Open Allocation"
+          id: "obj_investment",
+          objectiveKey: "CAPITAL_GROWTH",
+          title: "Capital Growth & Land Banking",
+          shortTag: "50% Presale Equity",
+          subtitle: "Locking in 50% below public launch price to maximize high ROI as Ungwan Rimi spills over.",
+          icon: "📈",
+          color: "bg-[#B8001F]",
+          badge: "Double Your Capital"
+        },
+        {
+          id: "obj_commercial",
+          objectiveKey: "BLOCK_OF_FLATS",
+          title: "Block of Flats / Rental Income",
+          shortTag: "High Cashflow Asset",
+          subtitle: "Seeking 900 SQM parcel for developing rental apartments with steady recurring dividend.",
+          icon: "🏢",
+          color: "bg-[#111827]",
+          badge: "High Rental Demand"
+        },
+        {
+          id: "obj_diaspora",
+          objectiveKey: "DIASPORA",
+          title: "Diaspora / Living Outside Kaduna",
+          shortTag: "Secure Ancestral Asset",
+          subtitle: "Seeking 100% verified C of O titled land in Kaduna with virtual inspection & KADGIS verification.",
+          icon: "✈️",
+          color: "bg-[#111827]",
+          badge: "Verifiable Title"
         }
       ]
     },
 
-    // QUESTION 3: Plot Sizes & Pricing (Dynamic Branching)
+    // QUESTION 3: Plot Sizes & 50% Pricing Matrix
     {
       id: "q3",
       stepNumber: 3,
       totalSteps: 4,
-      title: "Which plot size are you interested in?",
-      subtitle: "Select your target plot size and building type for Navy Estate Innovation City:",
-      // Subsidized Military Pricing Options
-      militaryOptions: [
-        { id: "plot_m_170", size: "170 SQM", price: "₦9.5M", title: "170 SQM (₦9.5M)", shortTag: "Terrace Duplex Plot", subtitle: "Subsidized plot for 3-4 bedroom terrace duplex", icon: "🏛️", color: "bg-[#0A2558]", badge: "Military Rate" },
-        { id: "plot_m_250", size: "250 SQM", price: "₦13.5M", title: "250 SQM (₦13.5M)", shortTag: "Semi-Detached Duplex", subtitle: "Subsidized plot for 4-bedroom semi-detached duplex", icon: "🏡", color: "bg-[#0A2558]", badge: "Most Popular" },
-        { id: "plot_m_450", size: "450 SQM", price: "₦22.3M", title: "450 SQM (₦22.3M)", shortTag: "Fully Detached Duplex", subtitle: "Subsidized plot for 4-5 bedroom detached duplex with BQ", icon: "💎", color: "bg-[#0A2558]", badge: "Military Rate" },
-        { id: "plot_m_600", size: "600 SQM", price: "₦29.5M", title: "600 SQM (₦29.5M)", shortTag: "Luxury Detached Duplex", subtitle: "Subsidized plot for 5-bedroom luxury duplex + private pool", icon: "🌟", color: "bg-[#0A2558]", badge: "Military Rate" },
-        { id: "plot_m_850", size: "850 SQM", price: "₦41.5M", title: "850 SQM (₦41.5M)", shortTag: "Executive Mansion", subtitle: "Subsidized prime plot for palatial residence / ambassadorial home", icon: "👑", color: "bg-[#0A2558]", badge: "Military Rate" },
-        { id: "plot_m_1200", size: "1200 SQM", price: "₦57.5M", title: "1200 SQM (₦57.5M)", shortTag: "Block of Flats / Estate", subtitle: "Subsidized high-density plot for block of residential apartments", icon: "🏢", color: "bg-[#0A2558]", badge: "Military Rate" }
-      ],
-      // Approved Civilian Pricing Options
-      civilianOptions: [
-        { id: "plot_c_170", size: "170 SQM", price: "₦12M", title: "170 SQM (₦12M)", shortTag: "Terrace Duplex Plot", subtitle: "Approved plot for 3-4 bedroom terrace duplex", icon: "🏛️", color: "bg-[#185ADB]", badge: "Civilian Approved" },
-        { id: "plot_c_250", size: "250 SQM", price: "₦16M", title: "250 SQM (₦16M)", shortTag: "Semi-Detached Duplex", subtitle: "Approved plot for 4-bedroom semi-detached duplex", icon: "🏡", color: "bg-[#185ADB]", badge: "Most Popular" },
-        { id: "plot_c_450", size: "450 SQM", price: "₦24.8M", title: "450 SQM (₦24.8M)", shortTag: "Fully Detached Duplex", subtitle: "Approved plot for 4-5 bedroom detached duplex with BQ", icon: "💎", color: "bg-[#185ADB]", badge: "Civilian Approved" },
-        { id: "plot_c_600", size: "600 SQM", price: "₦32M", title: "600 SQM (₦32M)", shortTag: "Luxury Detached Duplex", subtitle: "Approved plot for 5-bedroom luxury duplex + private pool", icon: "🌟", color: "bg-[#185ADB]", badge: "Civilian Approved" },
-        { id: "plot_c_850", size: "850 SQM", price: "₦44M", title: "850 SQM (₦44M)", shortTag: "Executive Mansion", subtitle: "Approved prime plot for palatial residence / ambassadorial home", icon: "👑", color: "bg-[#185ADB]", badge: "Civilian Approved" },
-        { id: "plot_c_1200", size: "1200 SQM", price: "₦60M", title: "1200 SQM (₦60M)", shortTag: "Block of Flats / Estate", subtitle: "Approved high-density plot for block of residential apartments", icon: "🏢", color: "bg-[#185ADB]", badge: "Civilian Approved" }
+      title: "Which plot size and building plan are you interested in?",
+      subtitle: "Select your target plot size to lock in 50% presale pricing before the public launch:",
+      options: [
+        {
+          id: "plot_170",
+          size: "170 SQM",
+          price: "₦3.5M",
+          threeMonthPlan: "₦4.5M",
+          actualPrice: "₦7M",
+          savings: "Save ₦3.5M (50% Off)",
+          title: "170 SQM (₦3.5M Presale)",
+          buildingType: "Terrace Duplex Plot",
+          subtitle: "Subsidized plot for 3-4 bedroom luxury terrace duplex directly on a tarred road",
+          icon: "🏛️",
+          color: "bg-[#B8001F]",
+          badge: "Presale ₦3.5M"
+        },
+        {
+          id: "plot_250",
+          size: "250 SQM",
+          price: "₦5.5M",
+          threeMonthPlan: "₦7.5M",
+          actualPrice: "₦11M",
+          savings: "Save ₦5.5M (50% Off)",
+          title: "250 SQM (₦5.5M Presale)",
+          buildingType: "Semi-Detached Duplex",
+          subtitle: "Prime plot for 4-bedroom semi-detached duplex in family-friendly neighborhood",
+          icon: "🏡",
+          color: "bg-[#B8001F]",
+          badge: "Most Popular"
+        },
+        {
+          id: "plot_450",
+          size: "450 SQM",
+          price: "₦9M",
+          threeMonthPlan: "₦11M",
+          actualPrice: "₦18M",
+          savings: "Save ₦9M (50% Off)",
+          title: "450 SQM (₦9M Presale)",
+          buildingType: "Detached Duplex Plot",
+          subtitle: "Executive plot for palatial 5-bedroom detached duplex with BQ & ample parking",
+          icon: "💎",
+          color: "bg-[#B8001F]",
+          badge: "Executive Choice"
+        },
+        {
+          id: "plot_900",
+          size: "900 SQM",
+          price: "₦18M",
+          threeMonthPlan: "₦21M",
+          actualPrice: "₦36M",
+          savings: "Save ₦18M (50% Off)",
+          title: "900 SQM (₦18M Presale)",
+          buildingType: "Block of Flats / Multi-Unit",
+          subtitle: "High-density plot for building multi-door apartments & rental wealth engine",
+          icon: "🏢",
+          color: "bg-[#111827]",
+          badge: "Commercial / Flats"
+        }
       ]
     },
 
@@ -202,8 +265,8 @@ export const CONFIG = {
       id: "q4",
       stepNumber: 4,
       totalSteps: 4,
-      title: "When will you be available for inspection or visit to our office?",
-      subtitle: "Select your preferred timeline for a guided site tour or office visit at Asokoro:",
+      title: "When will you be available for site inspection or visit to our office?",
+      subtitle: "Select your preferred timeline for a private guided inspection in New Millennium City, Kaduna:",
       options: [
         {
           id: "insp_this_week",
@@ -211,34 +274,34 @@ export const CONFIG = {
           shortTag: "Monday – Friday",
           subtitle: "Available for on-site inspection or office consultation this week",
           icon: "📅",
-          color: "bg-[#0A2558]",
+          color: "bg-[#B8001F]",
           badge: "Fast Track"
         },
         {
           id: "insp_this_weekend",
           title: "This Weekend",
           shortTag: "Saturday / Sunday",
-          subtitle: "Weekend inspection tour with NBCCL project consultants",
+          subtitle: "Weekend guided site tour with Beacon project consultants",
           icon: "☀️",
-          color: "bg-[#0A2558]",
-          badge: "Weekend Slot"
+          color: "bg-[#B8001F]",
+          badge: "Weekend Tour"
         },
         {
           id: "insp_next_week",
           title: "Next Week",
           shortTag: "Flexible Schedule",
-          subtitle: "Planning ahead for a convenient visit during next week",
+          subtitle: "Planning ahead for a convenient private visit during next week",
           icon: "🗓️",
-          color: "bg-[#185ADB]",
-          badge: "Upcoming"
+          color: "bg-[#111827]",
+          badge: "Advance Booking"
         },
         {
-          id: "insp_outside_abuja",
-          title: "I am Outside Abuja / Overseas",
+          id: "insp_outside_kaduna",
+          title: "I am Outside Kaduna / Overseas",
           shortTag: "Virtual Inspection",
-          subtitle: "Request video walkthrough, cadastral layout docs & digital consultation",
+          subtitle: "Request video walkthrough, KADGIS C of O verification & digital allocation pass",
           icon: "✈️",
-          color: "bg-[#1E293B]",
+          color: "bg-[#111827]",
           badge: "Diaspora / Remote"
         }
       ]

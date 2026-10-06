@@ -31,14 +31,18 @@ import {
   Mail,
   X,
   Search,
-  Phone
+  Phone,
+  Compass,
+  Home,
+  CheckCircle,
+  AlertCircle
 } from 'lucide-react';
 import { CONFIG } from './quizConfig';
 import { 
   initAnalytics, 
   trackLandingPageView, 
   trackQuizStarted, 
-  trackQuestionViewed,
+  trackQuestionViewed, 
   trackAnswerSelected, 
   trackQuizCompleted, 
   trackLeadCaptured,
@@ -56,6 +60,8 @@ const COUNTRIES = [
   { code: 'US', name: 'United States', dialCode: '+1', flag: '🇺🇸' },
   { code: 'CA', name: 'Canada', dialCode: '+1', flag: '🇨🇦' },
   { code: 'AE', name: 'United Arab Emirates', dialCode: '+971', flag: '🇦🇪' },
+  { code: 'SA', name: 'Saudi Arabia', dialCode: '+966', flag: '🇸🇦' },
+  { code: 'QA', name: 'Qatar', dialCode: '+974', flag: '🇶🇦' },
   { code: 'GH', name: 'Ghana', dialCode: '+233', flag: '🇬🇭' },
   { code: 'ZA', name: 'South Africa', dialCode: '+27', flag: '🇿🇦' },
   { code: 'KE', name: 'Kenya', dialCode: '+254', flag: '🇰🇪' },
@@ -64,8 +70,6 @@ const COUNTRIES = [
   { code: 'FR', name: 'France', dialCode: '+33', flag: '🇫🇷' },
   { code: 'NL', name: 'Netherlands', dialCode: '+31', flag: '🇳🇱' },
   { code: 'AU', name: 'Australia', dialCode: '+61', flag: '🇦🇺' },
-  { code: 'SA', name: 'Saudi Arabia', dialCode: '+966', flag: '🇸🇦' },
-  { code: 'QA', name: 'Qatar', dialCode: '+974', flag: '🇶🇦' },
   { code: 'IT', name: 'Italy', dialCode: '+39', flag: '🇮🇹' },
   { code: 'ES', name: 'Spain', dialCode: '+34', flag: '🇪🇸' },
   { code: 'IN', name: 'India', dialCode: '+91', flag: '🇮🇳' },
@@ -94,28 +98,24 @@ export default function App() {
   const [agreedPolicy, setAgreedPolicy] = useState(true);
   const [isCalendarModalOpen, setIsCalendarModalOpen] = useState(false);
   const [hasSubmittedDetails, setHasSubmittedDetails] = useState(false);
-  const [matchedEstate, setMatchedEstate] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [analyzingProgress, setAnalyzingProgress] = useState(0);
   const [analyzingStage, setAnalyzingStage] = useState(0);
-  const [showComparison, setShowComparison] = useState(false);
-  const [selectedEstateTab, setSelectedEstateTab] = useState('EMINENCE_VILLA');
   const [showNotInterestedModal, setShowNotInterestedModal] = useState(false);
 
-  // Helper: Calculate Dynamic Match based on Answers
-  const getMatchedEstate = (currentAnswers) => {
-    const ans = currentAnswers || answers;
-    let matchedKey = 'INNOVATION_CITY';
-    const q1Target = ans.q1?.targetEstate;
-    const q2Target = ans.q2?.targetEstate;
+  // 15-Minute Promo Reservation Countdown Timer
+  const [timeLeft, setTimeLeft] = useState(14 * 60 + 59);
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft(prev => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
-    if (q2Target && q2Target !== 'AUTO') {
-      matchedKey = q2Target;
-    } else if (q1Target && q1Target !== 'AUTO') {
-      matchedKey = q1Target;
-    }
-
-    return CONFIG.estates[matchedKey] || CONFIG.estates.INNOVATION_CITY;
+  const formatTimer = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
   // Initialize Analytics & Detect Country by IP
@@ -142,52 +142,19 @@ export default function App() {
     detectCountry();
   }, []);
 
-  // Listen for GoHighLevel Calendar Booking Success postMessage
-  const [isAppointmentBooked, setIsAppointmentBooked] = useState(false);
-  useEffect(() => {
-    const handleGHLMessage = (e) => {
-      try {
-        const d = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
-        if (d && (d.action === 'appointment_booked' || d.type === 'booking_success' || d.event === 'appointment_booked')) {
-          setIsAppointmentBooked(true);
-          trackAppointmentConfirmed(matchedEstate?.name || 'Abuja Plot Inspection');
-        }
-      } catch (err) {
-        // Not a JSON message or unrelated message
-      }
-    };
-    window.addEventListener('message', handleGHLMessage);
-    return () => window.removeEventListener('message', handleGHLMessage);
-  }, [matchedEstate]);
-
-  // Track step & question views for Admin Funnel Drop-off analytics
+  // Track step & question views for Funnel Analytics
   useEffect(() => {
     if (screen === 'PAGE_1') {
-      trackQuestionViewed('q1', CONFIG.questions[0]?.title || 'Are you financially interested in the Navy Estate, Apo?');
+      trackQuestionViewed('q1', CONFIG.questions[0]?.title || 'Are you financially interested in Arewa Residences?');
     } else if (screen === 'QUIZ_STEPS') {
       const q = CONFIG.questions[currentStepIdx];
       if (q) {
         trackQuestionViewed(q.id, q.title);
       }
     } else if (screen === 'OPT_IN') {
-      trackQuestionViewed('optin', 'VIP Allocation Opt-In Form');
+      trackQuestionViewed('optin', 'Arewa Residences Presale Opt-In Form');
     }
   }, [screen, currentStepIdx]);
-
-  // 15-Minute Promo Countdown Timer
-  const [timeLeft, setTimeLeft] = useState(14 * 60 + 59);
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft(prev => (prev > 0 ? prev - 1 : 0));
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  const formatTimer = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
 
   // Handler: Select Question 1 on Page 1
   const handleSelectPage1Card = (option) => {
@@ -204,7 +171,7 @@ export default function App() {
       q1: option
     }));
 
-    setCurrentStepIdx(1); // Move to Question 2
+    setCurrentStepIdx(1); // Move to Question 2 (Objective)
     setScreen('QUIZ_STEPS');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -230,9 +197,6 @@ export default function App() {
           if (prev >= 100) {
             clearInterval(interval);
             setTimeout(() => {
-              const matched = getMatchedEstate();
-              setMatchedEstate(matched);
-              setSelectedEstateTab(matched.id);
               setScreen('OPT_IN');
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }, 500);
@@ -279,37 +243,36 @@ export default function App() {
     setLeadData(updatedLeadData);
     setIsSubmitting(true);
 
-    const estateObj = matchedEstate || getMatchedEstate();
-    setMatchedEstate(estateObj);
-    setSelectedEstateTab(estateObj.id);
+    const selectedObjective = answers.q2?.title || 'Buy & Build (Family Residence)';
+    const selectedPlot = answers.q3?.title || '250 SQM (₦5.5M Presale)';
+    const selectedPlotSize = answers.q3?.size || '250 SQM';
+    const selectedPresalePrice = answers.q3?.price || '₦5.5M';
+    const selectedActualPrice = answers.q3?.actualPrice || '₦11M';
+    const inspectionTime = answers.q4?.title || 'This Week';
 
-    const isMilitary = answers.q2?.categoryKey === 'MILITARY' || answers.q2?.title?.includes('Military');
-    const categoryTitle = answers.q2?.title || (isMilitary ? 'Military Personnel' : 'Civilian');
-    const selectedPlot = answers.q3?.title || '250 SQM Plot';
-    const selectedPrice = answers.q3?.price || (isMilitary ? '₦13.5M' : '₦16M');
-    const inspectionTime = answers.q4?.title || 'Flexible';
-
-    const formattedNotes = `🎯 NAVY ESTATE INNOVATION CITY APPLICATION:
-• Estate: Navy Estate Innovation City (Cadastral Zone, Apo, Abuja)
-• Developer: Naval Building & Construction Company Limited (NBCCL)
-• Applicant Category: ${categoryTitle}
-• Selected Plot: ${selectedPlot}
-• Official Allocation Rate: ${selectedPrice}
-• Inspection / Visit: ${inspectionTime}
-• Financial Interest: ${answers.q1?.title || 'Yes'}
+    const formattedNotes = `🎯 AREWA RESIDENCES PRESALE APPLICATION:
+• Project: Arewa Residences (New Millennium City, Kaduna)
+• Developer: Beacon Corporate Realty Ltd
+• Title: C of O Title (KADGIS Verifiable)
+• Selected Plot: ${selectedPlot} (${selectedPlotSize})
+• Presale Price: ${selectedPresalePrice} (Actual Launch Price: ${selectedActualPrice} - 50% Off)
+• 3-Month Plan: ${answers.q3?.threeMonthPlan || 'Available'}
+• Buyer Objective: ${selectedObjective}
+• Inspection / Consultation: ${inspectionTime}
 • Country: ${selectedCountry.name} (${selectedCountry.dialCode})
+• Financial Interest: ${answers.q1?.title || 'Yes'}
 • Submitted: ${new Date().toLocaleString()}`;
 
     trackLeadCaptured({
       name: leadData.name.trim(),
       phone: fullPhone,
-      email: leadData.email ? leadData.email.trim() : `${cleanPhone || Date.now()}@nbccl.leads`,
-      category: categoryTitle,
+      email: leadData.email ? leadData.email.trim() : `${cleanPhone || Date.now()}@arewa.leads`,
+      category: selectedObjective,
       selected_plot: selectedPlot,
-      plot_price: selectedPrice,
+      plot_price: selectedPresalePrice,
       inspection_timing: inspectionTime,
-      matched_estate_name: "Navy Estate Innovation City"
-    }, estateObj.id);
+      matched_estate_name: "Arewa Residences, Kaduna"
+    }, "AREWA_RESIDENCES");
 
     // GHL Webhook Payload
     const payload = {
@@ -317,25 +280,29 @@ export default function App() {
       first_name: leadData.name.trim().split(' ')[0],
       last_name: leadData.name.trim().split(' ').slice(1).join(' ') || '',
       phone: fullPhone,
-      email: leadData.email ? leadData.email.trim() : `${cleanPhone || Date.now()}@nbccl.leads`,
+      email: leadData.email ? leadData.email.trim() : `${cleanPhone || Date.now()}@arewa.leads`,
       tags: [
-        "navy-estate-innovation-city",
-        isMilitary ? "category-military" : "category-civilian",
-        "cadastral-zone-apo",
-        "nbccl-application",
+        "arewa-residences-kaduna",
+        "beacon-corporate-realty",
+        "new-millennium-city",
+        "presale-50-percent-off",
+        `plot-${selectedPlotSize.toLowerCase().replace(/\s+/g, '-')}`,
+        `objective-${selectedObjective.toLowerCase().replace(/[^a-z0-9]/g, '-')}`,
         `country-${selectedCountry.code.toLowerCase()}`
       ],
       notes: formattedNotes,
       custom_fields: {
-        applicant_category: categoryTitle,
-        selected_plot_size: selectedPlot,
-        plot_price: selectedPrice,
+        applicant_objective: selectedObjective,
+        selected_plot_size: selectedPlotSize,
+        presale_price: selectedPresalePrice,
+        actual_price: selectedActualPrice,
         inspection_timeline: inspectionTime,
-        matched_estate_name: "Navy Estate Innovation City",
-        matched_estate_location: "Cadastral Zone, Apo, Abuja",
+        development_project: "Arewa Residences",
+        location: "New Millennium City, Kaduna",
+        title_type: "C of O Title",
         country_code: selectedCountry.code
       },
-      source: "Navy Estate Innovation City Quiz Funnel - NBCCL",
+      source: "Arewa Residences Kaduna Funnel - Beacon Realty",
       submitted_at: new Date().toISOString()
     };
 
@@ -347,7 +314,7 @@ export default function App() {
       keepalive: true
     }).catch(err => console.error("Webhook error:", err));
 
-    trackQuizCompleted(estateObj.id);
+    trackQuizCompleted("AREWA_RESIDENCES");
 
     setTimeout(() => {
       setIsSubmitting(false);
@@ -357,31 +324,35 @@ export default function App() {
   };
 
   // --------------------------------------------------------------------------
-  // SCREEN 1: NAVY ESTATE INNOVATION CITY HERO & HOOK SCREEN (NBCCL)
+  // SCREEN 1: HERO & QUESTION 1 (AREWA RESIDENCES • BEACON REALTY)
   // --------------------------------------------------------------------------
   if (screen === 'PAGE_1') {
     const q1Config = CONFIG.questions[0];
 
-    // Card component to allow clean reuse for top hero and below-fold CTA
     const OptionCards = () => (
       <div className="grid grid-cols-2 gap-3 sm:gap-6 max-w-xl mx-auto w-full">
         {q1Config.options.map((option) => (
           <button
             key={option.id}
             onClick={() => handleSelectPage1Card(option)}
-            className="group flex flex-col rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1.5 focus:outline-none focus:ring-4 focus:ring-blue-900/20 cursor-pointer bg-white"
+            className="group flex flex-col rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-300 hover:-translate-y-1.5 focus:outline-none focus:ring-4 focus:ring-red-700/20 cursor-pointer bg-white border border-slate-200 hover:border-[#B8001F]"
           >
-            {/* Photo Top (1:1 Square Aspect Ratio so both fit side-by-side on mobile) */}
-            <div className="w-full aspect-square overflow-hidden bg-slate-100">
+            {/* Photo Top (1:1 Square Aspect Ratio) */}
+            <div className="w-full aspect-square overflow-hidden bg-slate-100 relative">
               <img 
                 src={option.image} 
                 alt={option.title}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
+              {option.badge && (
+                <div className="absolute top-2.5 right-2.5 bg-black/80 backdrop-blur-xs text-white text-[9px] sm:text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md border border-white/20">
+                  {option.badge}
+                </div>
+              )}
             </div>
 
-            {/* Bottom Solid Colored Action Bar (Iconic Perspective DNA) */}
-            <div className={`${option.color || 'bg-[#0A2558]'} py-3 sm:py-4 px-2 sm:px-3 text-center text-white font-extrabold text-base sm:text-xl tracking-tight group-hover:brightness-105 transition-all shadow-xs`}>
+            {/* Bottom Solid Colored Action Bar (Iconic Perspective DNA - Flyer Crimson) */}
+            <div className={`${option.color || 'bg-[#B8001F]'} py-3 sm:py-4 px-2 sm:px-3 text-center text-white font-extrabold text-base sm:text-xl tracking-tight group-hover:brightness-110 transition-all shadow-xs`}>
               <span>{option.title}</span>
             </div>
           </button>
@@ -390,35 +361,48 @@ export default function App() {
     );
 
     return (
-      <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A] flex flex-col font-sans selection:bg-[#0A2558] selection:text-white">
+      <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A] flex flex-col font-sans selection:bg-[#B8001F] selection:text-white">
         
-        {/* OFFICIAL NBCCL BRAND HEADER */}
-        <header className="px-4 py-4 sm:px-8 max-w-5xl mx-auto w-full flex items-center justify-between border-b border-slate-200/60 bg-white/80 backdrop-blur-md sticky top-0 z-30">
+        {/* TOP URGENCY / SCARCITY TICKER */}
+        <div className="bg-gradient-to-r from-[#8B0000] via-[#B8001F] to-[#8B0000] text-white py-2 px-4 text-center text-xs sm:text-sm font-bold tracking-wide flex items-center justify-center gap-2 shadow-sm">
+          <span className="animate-pulse">🔥</span>
+          <span><strong>PRESALE TIER 1 OPEN:</strong> 50% Off Outright Allocation • Only 8 Slots Remaining in Batch 1</span>
+          <span className="hidden md:inline bg-black/30 text-white/90 text-[10px] uppercase font-black px-2 py-0.5 rounded-full ml-1">
+            Ends Soon
+          </span>
+        </div>
+
+        {/* OFFICIAL BEACON CORPORATE REALTY HEADER */}
+        <header className="px-4 py-3 sm:py-4 sm:px-8 max-w-5xl mx-auto w-full flex items-center justify-between border-b border-slate-200/80 bg-white/90 backdrop-blur-md sticky top-0 z-30">
           <div className="flex items-center gap-3">
             <img 
-              src="/nbccl-logo.svg" 
-              alt="NBCCL Crest" 
-              className="h-10 sm:h-12 w-auto object-contain shrink-0"
-              onError={(e) => { e.target.style.display = 'none'; }}
+              src="/beacon-logo.png" 
+              alt="Beacon Corporate Realty Ltd" 
+              className="h-9 sm:h-11 w-auto object-contain shrink-0"
+              onError={(e) => {
+                e.target.style.display = 'none';
+              }}
             />
             <div>
-              <span className="text-xs sm:text-sm font-black text-[#0A2558] tracking-tight block leading-tight">
-                NAVAL BUILDING &amp; CONSTRUCTION
+              <span className="text-xs sm:text-sm font-black text-[#111827] tracking-tight block leading-tight">
+                BEACON CORPORATE REALTY LTD
               </span>
-              <span className="text-[10px] sm:text-xs font-bold text-slate-500 tracking-wider uppercase block">
-                COMPANY LIMITED (NBCCL)
+              <span className="text-[10px] sm:text-xs font-semibold text-[#B8001F] tracking-wide uppercase block">
+                Secure Your Tomorrow.
               </span>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="hidden sm:flex items-center gap-1.5 text-xs font-bold text-[#0A2558] bg-[#EEF4FC] border border-[#CBDDF7] px-3 py-1.5 rounded-full shadow-2xs">
-              <MapPin className="w-3.5 h-3.5 text-[#C59B27]" />
-              <span>Cadastral Zone, Apo</span>
+            <div className="hidden sm:flex items-center gap-1.5 text-xs font-bold text-[#111827] bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-full shadow-2xs">
+              <MapPin className="w-3.5 h-3.5 text-[#B8001F]" />
+              <span>New Millennium City, Kaduna</span>
             </div>
-            <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-full shadow-2xs">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-              <span>Military &amp; Civilians Welcome</span>
+
+            {/* GOLD C OF O BADGE (From Flyer) */}
+            <div className="flex items-center gap-1.5 text-xs font-extrabold text-[#78350F] bg-gradient-to-r from-amber-50 to-amber-100 border border-amber-300 px-3 py-1.5 rounded-full shadow-2xs">
+              <Award className="w-4 h-4 text-[#D4AF37] fill-[#D4AF37]" />
+              <span>C OF O TITLE</span>
             </div>
           </div>
         </header>
@@ -428,93 +412,120 @@ export default function App() {
           
           {/* TOP EYEBROW BADGE */}
           <div className="flex justify-center mb-4 sm:mb-5">
-            <span className="inline-flex items-center gap-2 bg-[#EEF4FC] text-[#0A2558] border border-[#CBDDF7] px-4 py-1.5 rounded-full text-xs font-black tracking-wider uppercase shadow-2xs">
-              <Sparkles className="w-3.5 h-3.5 text-[#C59B27]" />
-              <span>Official Residential Opening • Apo, Abuja</span>
+            <span className="inline-flex items-center gap-2 bg-red-50 text-[#B8001F] border border-red-200 px-4 py-1.5 rounded-full text-xs font-black tracking-wider uppercase shadow-2xs">
+              <Sparkles className="w-3.5 h-3.5 text-[#B8001F]" />
+              <span>Official Presale Now Open • Buy &amp; Build Directly on a Tarred Road</span>
             </span>
           </div>
 
-          {/* MAIN HEADLINE & QUESTION */}
+          {/* MAIN HEADLINE & NARRATIVE */}
           <div className="text-center max-w-3xl mx-auto mb-6 sm:mb-8">
-            <h1 className="text-2xl sm:text-4xl lg:text-[44px] font-black text-[#0A2558] tracking-tight leading-[1.15] mb-3">
-              A New Navy Estate Has Opened in Apo
+            <h1 className="text-3xl sm:text-4xl lg:text-[46px] font-black text-[#111827] tracking-tight leading-[1.12] mb-3">
+              Arewa Residences Is Now Open in New Millennium City
             </h1>
             <p className="text-sm sm:text-base text-slate-600 font-medium leading-relaxed max-w-2xl mx-auto mb-4 sm:mb-5">
-              A new opportunity has quietly opened in Apo, Abuja — and it’s not just another private estate. <strong className="text-slate-900 font-bold">Navy Estate Innovation City</strong> is a residential development by <strong className="text-[#0A2558] font-bold">Naval Building &amp; Construction Company Limited (NBCCL)</strong>, now open to <strong className="text-slate-900 font-bold">both military personnel and civilians</strong>.
+              Kaduna's primary growth corridor has officially unlocked. Situated on the direct expansion boundary with <strong className="text-slate-900 font-bold">Ungwan Rimi</strong> (the <em>"Maitama of Kaduna"</em>), <strong className="text-[#B8001F] font-bold">Arewa Residences</strong> offers genuine <strong className="text-slate-900 font-bold">C of O titled land</strong>, fully serviced directly on a tarred road at <strong className="text-[#B8001F] font-bold">50% presale discount</strong> before public launch.
             </p>
             <p className="text-lg sm:text-2xl font-black text-slate-900 tracking-tight leading-snug">
-              Are you financially interested in the Navy Estate, Apo?
+              Are you financially interested in securing a plot at Arewa Residences, New Millennium City?
             </p>
           </div>
 
           {/* QUESTION 1 OPTION CARDS (PERSPECTIVE 2-CARD LAYOUT) */}
-          <div className="mb-20 sm:mb-24">
+          <div className="mb-14 sm:mb-16">
             <OptionCards />
           </div>
 
           {/* ───────────────────────────────────────────────────────────── */}
-          {/* SECTION 2: INSTITUTIONAL TRUST & EXECUTION FEATURES */}
+          {/* SECTION 2: FLYER HIGHLIGHTS & CORE PILLARS                    */}
           {/* ───────────────────────────────────────────────────────────── */}
-          <div className="pt-12 border-t border-slate-200 mb-20 sm:mb-24">
-            <h2 className="text-2xl sm:text-3xl font-black text-[#0A2558] text-center max-w-2xl mx-auto mb-3 leading-tight">
-              Why Navy Estate Innovation City by NBCCL?
-            </h2>
-            <p className="text-center text-sm sm:text-base text-slate-600 max-w-xl mx-auto mb-12">
-              Guaranteed infrastructure, verified legal title, and structured development by Naval Building &amp; Construction Company Limited.
-            </p>
+          <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-10 shadow-sm mb-14 sm:mb-16">
+            <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-10">
+              <span className="text-xs font-black text-[#B8001F] uppercase tracking-widest block mb-1">
+                Invest • Live • Build • Belong
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-black text-[#111827] tracking-tight">
+                Why Smart Money Is Securing Arewa Residences Now
+              </h2>
+            </div>
 
-            {/* 4 Circular Trust Feature Items in 2x2 Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-12 max-w-3xl mx-auto text-center">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               
               {/* Item 1 */}
-              <div className="flex flex-col items-center">
-                <div className="w-24 h-24 rounded-full bg-[#EEF4FC] border border-[#CBDDF7] flex items-center justify-center mb-4 shadow-sm text-[#0A2558]">
-                  <Building2 className="w-10 h-10" />
+              <div className="flex flex-col p-5 rounded-2xl bg-slate-50 border border-slate-100 hover:border-red-200 transition-all">
+                <div className="w-12 h-12 rounded-xl bg-red-100 text-[#B8001F] flex items-center justify-center mb-4">
+                  <Compass className="w-6 h-6" />
                 </div>
-                <h3 className="text-lg font-extrabold text-[#0A2558] mb-1.5">
-                  Structured NBCCL Development
+                <h3 className="text-base font-extrabold text-slate-900 mb-1.5">
+                  Directly on a Tarred Road
                 </h3>
-                <p className="text-sm text-slate-600 leading-relaxed max-w-sm">
-                  Known for structured development, quality infrastructure, and prompt execution across Abuja.
+                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                  Zero interior bush pathways or rugged access. Immediate smooth asphalt connectivity straight to your plot gate.
                 </p>
               </div>
 
               {/* Item 2 */}
-              <div className="flex flex-col items-center">
-                <div className="w-24 h-24 rounded-full bg-[#FAF5E6] border border-[#EEDFB8] flex items-center justify-center mb-4 shadow-sm text-[#C59B27]">
-                  <FileText className="w-10 h-10" />
+              <div className="flex flex-col p-5 rounded-2xl bg-slate-50 border border-slate-100 hover:border-red-200 transition-all">
+                <div className="w-12 h-12 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center mb-4">
+                  <Award className="w-6 h-6" />
                 </div>
-                <h3 className="text-lg font-extrabold text-[#0A2558] mb-1.5">
-                  Verified Cadastral Allocation
+                <h3 className="text-base font-extrabold text-slate-900 mb-1.5">
+                  C of O Title (KADGIS Verified)
                 </h3>
-                <p className="text-sm text-slate-600 leading-relaxed max-w-sm">
-                  Located in Cadastral Zone, Apo, Abuja with verifiable allocation and clear title, ensuring zero dispute risk.
+                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                  100% government titled land. 100% free from customary family disputes. Verifiable directly at the Kaduna Geographic Information Service.
                 </p>
               </div>
 
               {/* Item 3 */}
-              <div className="flex flex-col items-center">
-                <div className="w-24 h-24 rounded-full bg-[#EAF2EC] border border-[#D4E4D8] flex items-center justify-center mb-4 shadow-sm text-emerald-700">
-                  <UserCheck className="w-10 h-10" />
+              <div className="flex flex-col p-5 rounded-2xl bg-slate-50 border border-slate-100 hover:border-red-200 transition-all">
+                <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center mb-4">
+                  <Home className="w-6 h-6" />
                 </div>
-                <h3 className="text-lg font-extrabold text-[#0A2558] mb-1.5">
-                  Military &amp; Civilian Inclusivity
+                <h3 className="text-base font-extrabold text-slate-900 mb-1.5">
+                  Buy &amp; Build Ready
                 </h3>
-                <p className="text-sm text-slate-600 leading-relaxed max-w-sm">
-                  Now open to both Armed Forces personnel and civilian buyers with subsidized military rates and civilian allocations.
+                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                  Solid, dry, ready-to-build topography. Start your foundation immediately or hold for massive capital growth.
                 </p>
               </div>
 
               {/* Item 4 */}
-              <div className="flex flex-col items-center">
-                <div className="w-24 h-24 rounded-full bg-[#EEF4FC] border border-[#CBDDF7] flex items-center justify-center mb-4 shadow-sm text-[#185ADB]">
-                  <HardHat className="w-10 h-10" />
+              <div className="flex flex-col p-5 rounded-2xl bg-slate-50 border border-slate-100 hover:border-red-200 transition-all">
+                <div className="w-12 h-12 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center mb-4">
+                  <Building2 className="w-6 h-6" />
                 </div>
-                <h3 className="text-lg font-extrabold text-[#0A2558] mb-1.5">
-                  Naval-Grade Infrastructure &amp; Security
+                <h3 className="text-base font-extrabold text-slate-900 mb-1.5">
+                  Ungwan Rimi Spillover Corridor
                 </h3>
-                <p className="text-sm text-slate-600 leading-relaxed max-w-sm">
-                  Perimeter fencing, 24/7 guarded gatehouse, asphalt access roads, dedicated power grid, and storm drainage.
+                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                  Ungwan Rimi is fully built-out with land at ₦30M–₦60M+. Millennium City is the natural expansion corridor for Kaduna's elite.
+                </p>
+              </div>
+
+              {/* Item 5 */}
+              <div className="flex flex-col p-5 rounded-2xl bg-slate-50 border border-slate-100 hover:border-red-200 transition-all">
+                <div className="w-12 h-12 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center mb-4">
+                  <Landmark className="w-6 h-6" />
+                </div>
+                <h3 className="text-base font-extrabold text-slate-900 mb-1.5">
+                  Elite Landmarks &amp; Security
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                  Surrounded by the Nigerian Navy Base, Police Housing Estate, NNPC quarters, and the President Tinubu-commissioned General Hospital.
+                </p>
+              </div>
+
+              {/* Item 6 */}
+              <div className="flex flex-col p-5 rounded-2xl bg-slate-50 border border-slate-100 hover:border-red-200 transition-all">
+                <div className="w-12 h-12 rounded-xl bg-rose-100 text-[#B8001F] flex items-center justify-center mb-4">
+                  <TrendingUp className="w-6 h-6" />
+                </div>
+                <h3 className="text-base font-extrabold text-slate-900 mb-1.5">
+                  50% Instant Presale Margin
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                  Enter at ₦3.5M instead of ₦7M, or ₦5.5M instead of ₦11M. Lock in 100% price upside the moment the estate launches publicly.
                 </p>
               </div>
 
@@ -522,15 +533,18 @@ export default function App() {
           </div>
 
           {/* ───────────────────────────────────────────────────────────── */}
-          {/* SECTION 3: REPEATED CALL TO ACTION (PERSPECTIVE DNA) */}
+          {/* SECTION 3: REPEATED CALL TO ACTION (PERSPECTIVE DNA)          */}
           {/* ───────────────────────────────────────────────────────────── */}
-          <div className="pt-12 border-t border-slate-200 mb-20 sm:mb-24">
-            <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-10">
-              <h2 className="text-2xl sm:text-3xl font-black text-[#0A2558] tracking-tight mb-2">
-                Check Plot Availability &amp; Opening Rates 🎯
+          <div className="pt-6 mb-16 sm:mb-20">
+            <div className="text-center max-w-3xl mx-auto mb-8">
+              <span className="text-xs font-black text-[#B8001F] uppercase tracking-widest block mb-1">
+                Limited Allocations
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-black text-[#111827] tracking-tight mb-2">
+                Check Plot Availability &amp; 50% Presale Rates 🎯
               </h2>
               <p className="text-base text-slate-600 font-medium">
-                Are you financially interested in the Navy Estate, Apo?
+                Are you financially interested in securing a plot at Arewa Residences, New Millennium City?
               </p>
             </div>
 
@@ -538,38 +552,38 @@ export default function App() {
           </div>
 
           {/* ───────────────────────────────────────────────────────────── */}
-          {/* SECTION 4: OFFICIAL NBCCL PROJECT & OFFICE CARD */}
+          {/* SECTION 4: OFFICIAL BEACON CORPORATE REALTY CARD             */}
           {/* ───────────────────────────────────────────────────────────── */}
           <div className="max-w-4xl mx-auto w-full">
-            <div className="bg-[#0A2558] text-white rounded-3xl p-6 sm:p-10 shadow-2xl relative overflow-hidden border border-[#051535]">
+            <div className="bg-[#111827] text-white rounded-3xl p-6 sm:p-10 shadow-xl relative overflow-hidden border border-slate-800">
               
-              {/* Subtle Gold Ambient Glow */}
-              <div className="absolute top-0 right-0 w-80 h-80 bg-[#C59B27]/10 rounded-full blur-3xl pointer-events-none"></div>
+              {/* Crimson Ambient Glow */}
+              <div className="absolute top-0 right-0 w-80 h-80 bg-[#B8001F]/20 rounded-full blur-3xl pointer-events-none"></div>
 
               <div className="relative z-10 max-w-2xl">
                 <div className="inline-flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full text-xs font-bold text-slate-200 mb-4 border border-white/15">
-                  <Building2 className="w-3.5 h-3.5 text-[#C59B27]" />
-                  <span>Official Developer &amp; Project Liaison</span>
+                  <Building2 className="w-3.5 h-3.5 text-[#D4AF37]" />
+                  <span>Developer &amp; Project Liaison</span>
                 </div>
 
                 <h3 className="text-xl sm:text-2xl font-black tracking-tight mb-2 text-white">
-                  Naval Building &amp; Construction Company Limited
+                  Beacon Corporate Realty Ltd
                 </h3>
                 
-                <p className="text-sm sm:text-base text-slate-200 mb-6 leading-relaxed">
-                  Cluster C, Admiralty Estate, Navy Town Asokoro, FCT Abuja.<br />
-                  Direct Project Inquiries: <strong>+234 703 829 2131</strong>, <strong>+234 902 131 1681</strong><br />
-                  Email: <strong>nbccl.ng@gmail.com</strong>
+                <p className="text-sm sm:text-base text-slate-300 mb-6 leading-relaxed">
+                  New Millennium City Expansion Corridor, Kaduna, Nigeria.<br />
+                  Official Website: <strong>www.beaconrealty.ng</strong><br />
+                  Slogan: <em>"Arewa Today, Greater Tomorrows."</em>
                 </p>
 
                 <div className="flex items-center justify-between flex-wrap gap-3 pt-4 border-t border-white/15">
                   <div className="text-xs text-slate-300">
-                    Application Form No: <strong>JVA</strong> • Fee: <strong>₦30,000.00</strong>
+                    Title: <strong>Certificate of Occupancy (C of O)</strong> • Cadastral Registered
                   </div>
 
                   <div className="inline-flex items-center gap-1.5 bg-emerald-500/20 text-emerald-300 px-3 py-1 rounded-full text-xs font-semibold border border-emerald-500/30">
                     <ShieldCheck className="w-3.5 h-3.5" />
-                    <span>NBCCL Verified Development</span>
+                    <span>KADGIS Verifiable Project</span>
                   </div>
                 </div>
               </div>
@@ -579,7 +593,7 @@ export default function App() {
 
         </main>
 
-        {/* NOT INTERESTED POLITE MODAL */}
+        {/* NOT INTERESTED MODAL */}
         {showNotInterestedModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-fade-in">
             <div className="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-200 text-center">
@@ -587,30 +601,29 @@ export default function App() {
                 <Check className="w-7 h-7" />
               </div>
               
-              <h3 className="text-xl font-black text-[#0A2558] mb-2">
+              <h3 className="text-xl font-black text-[#111827] mb-2">
                 Thank You for Your Feedback! 🤝
               </h3>
               
               <p className="text-sm text-slate-600 mb-6 leading-relaxed">
-                We completely respect your timing. Navy Estate Innovation City in Apo is currently in its limited opening phase. If you'd ever like general inquiries or future updates from NBCCL, feel free to contact us:
+                We completely respect your timing. Arewa Residences in New Millennium City is currently in its limited 50% early-bird presale phase. If you'd like general updates or future estate announcements in Kaduna, our team is always available:
               </p>
 
               <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 text-xs text-slate-700 text-left mb-6 space-y-1.5">
-                <div><strong>Office:</strong> Cluster C, Admiralty Estate, Navy Town Asokoro, Abuja</div>
-                <div><strong>Phone:</strong> +234 703 829 2131 / +234 902 131 1681</div>
-                <div><strong>Email:</strong> nbccl.ng@gmail.com</div>
+                <div><strong>Company:</strong> Beacon Corporate Realty Ltd</div>
+                <div><strong>Location:</strong> New Millennium City, Kaduna</div>
+                <div><strong>Website:</strong> www.beaconrealty.ng</div>
               </div>
 
               <div className="space-y-2.5">
                 <button
                   onClick={() => {
                     setShowNotInterestedModal(false);
-                    // allow them to proceed if they change their mind
                     handleSelectPage1Card(q1Config.options[0]);
                   }}
-                  className="w-full bg-[#0A2558] hover:bg-[#07193C] text-white font-bold py-3 px-4 rounded-xl transition-all cursor-pointer text-sm shadow-md"
+                  className="w-full bg-[#B8001F] hover:bg-[#8B0000] text-white font-bold py-3 px-4 rounded-xl transition-all cursor-pointer text-sm shadow-md"
                 >
-                  Actually, Check Plot Sizes &amp; Rates →
+                  Actually, Check Plot Sizes &amp; 50% Rates →
                 </button>
                 <button
                   onClick={() => setShowNotInterestedModal(false)}
@@ -625,49 +638,48 @@ export default function App() {
 
         {/* FOOTER */}
         <footer className="border-t border-slate-200 bg-white py-6 px-4 text-center text-xs text-slate-500">
-          <p>© {new Date().getFullYear()} Naval Building &amp; Construction Company Limited (NBCCL). Navy Estate Innovation City, Cadastral Zone, Apo, Abuja.</p>
+          <p>© {new Date().getFullYear()} Beacon Corporate Realty Ltd. Arewa Residences, New Millennium City, Kaduna. All rights reserved.</p>
         </footer>
       </div>
     );
   }
 
   // --------------------------------------------------------------------------
-  // SCREEN 2: QUIZ STEPS (QUESTIONS 2, 3, 4 - DYNAMIC BRANCHING)
+  // SCREEN 2: QUIZ STEPS (QUESTIONS 2, 3, 4)
   // --------------------------------------------------------------------------
   if (screen === 'QUIZ_STEPS') {
     const currentQ = CONFIG.questions[currentStepIdx];
     const progressPercent = Math.round(((currentStepIdx + 1) / CONFIG.questions.length) * 100);
-    const isMilitary = answers.q2?.categoryKey === 'MILITARY' || answers.q2?.title?.includes('Military');
 
     return (
-      <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A] flex flex-col font-sans selection:bg-[#0A2558] selection:text-white">
+      <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A] flex flex-col font-sans selection:bg-[#B8001F] selection:text-white">
         
         {/* TOP HEADER WITH BACK & STEP PROGRESS */}
-        <header className="px-4 py-4 sm:px-8 max-w-5xl mx-auto w-full flex items-center justify-between border-b border-slate-200/60 bg-white/80 backdrop-blur-md sticky top-0 z-30">
+        <header className="px-4 py-3 sm:py-4 sm:px-8 max-w-5xl mx-auto w-full flex items-center justify-between border-b border-slate-200/80 bg-white/90 backdrop-blur-md sticky top-0 z-30">
           <button 
             onClick={handleBackStep}
-            className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-slate-600 hover:text-[#0A2558] transition-colors py-1.5 px-3 rounded-xl hover:bg-slate-100 border border-transparent hover:border-slate-200 cursor-pointer"
+            className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-slate-600 hover:text-[#B8001F] transition-colors py-1.5 px-3 rounded-xl hover:bg-slate-100 border border-transparent hover:border-slate-200 cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Back</span>
           </button>
 
           {/* Step Counter Pill */}
-          <div className="text-xs font-black text-[#0A2558] bg-[#EEF4FC] border border-[#CBDDF7] px-3.5 py-1.5 rounded-full shadow-2xs">
+          <div className="text-xs font-black text-[#B8001F] bg-red-50 border border-red-200 px-3.5 py-1.5 rounded-full shadow-2xs">
             Step {currentStepIdx + 1} of {CONFIG.questions.length}
           </div>
 
-          <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-200 shadow-2xs">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Cadastral Verified</span>
+          <div className="flex items-center gap-1.5 text-xs font-bold text-[#78350F] bg-amber-50 px-3 py-1.5 rounded-full border border-amber-300 shadow-2xs">
+            <Award className="w-3.5 h-3.5 text-[#D4AF37] fill-[#D4AF37]" />
+            <span>C OF O TITLE</span>
           </div>
         </header>
 
-        {/* PROGRESS BAR */}
+        {/* PROGRESS BAR WITH FLYER CRIMSON FILL */}
         <div className="max-w-5xl mx-auto px-4 sm:px-8 w-full pt-2">
           <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
             <div 
-              className="bg-[#0A2558] h-full transition-all duration-300 ease-out rounded-full"
+              className="bg-gradient-to-r from-[#B8001F] to-[#DC2626] h-full transition-all duration-300 ease-out rounded-full"
               style={{ width: `${progressPercent}%` }}
             ></div>
           </div>
@@ -677,172 +689,204 @@ export default function App() {
         <main className="flex-1 max-w-4xl mx-auto w-full px-4 sm:px-6 py-6 sm:py-10 flex flex-col justify-center">
           
           <div className="text-center mb-6 sm:mb-8">
-            <span className="text-xs font-extrabold tracking-wider uppercase text-[#0A2558] bg-[#EEF4FC] border border-[#CBDDF7] px-3 py-1 rounded-full inline-block mb-3 shadow-2xs">
+            <span className="text-xs font-extrabold tracking-wider uppercase text-[#B8001F] bg-red-50 border border-red-200 px-3 py-1 rounded-full inline-block mb-3 shadow-2xs">
               Step {currentStepIdx + 1} of {CONFIG.questions.length}
             </span>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-[#0A2558] tracking-tight leading-tight mb-2">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-[#111827] tracking-tight leading-tight mb-2">
               {currentQ.title}
             </h2>
             <p className="text-sm sm:text-base text-slate-600 font-medium max-w-lg mx-auto">
-              {currentQ.id === 'q3' 
-                ? (isMilitary ? "Exclusive subsidized military allocation rates for Armed Forces personnel:" : "Approved civilian allocation rates for private investors and families:")
-                : currentQ.subtitle}
+              {currentQ.subtitle}
             </p>
           </div>
 
-          {/* QUESTION 2: CATEGORY (MILITARY VS CIVILIAN) - 2 CLEAN CARDS 1x1 ON MOBILE */}
+          {/* QUESTION 2: OBJECTIVE CARDS */}
           {currentQ.id === 'q2' && (
-            <div className="grid grid-cols-2 gap-3 sm:gap-6 max-w-xl mx-auto w-full">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-5 max-w-2xl mx-auto w-full">
               {currentQ.options.map((option) => (
                 <button
                   key={option.id}
                   onClick={() => handleSelectQuizStep(currentQ.id, option)}
-                  className="group flex flex-col rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-200 hover:-translate-y-1.5 focus:outline-none focus:ring-4 focus:ring-blue-900/20 cursor-pointer bg-white border border-slate-200/90 text-left"
+                  className="group flex flex-col p-5 rounded-2xl bg-white border border-slate-200 hover:border-[#B8001F] shadow-sm hover:shadow-xl transition-all duration-200 hover:-translate-y-1 text-left cursor-pointer"
                 >
-                  <div className="w-full aspect-square overflow-hidden bg-slate-100 relative">
-                    <img 
-                      src={option.image} 
-                      alt={option.title} 
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
-                    />
-                    {option.badge && (
-                      <span className="absolute top-2.5 right-2.5 text-[9px] sm:text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-white/95 text-[#0A2558] shadow-md backdrop-blur-xs border border-white/70">
-                        {option.badge}
-                      </span>
-                    )}
+                  <div className="flex items-center justify-between gap-2 mb-3">
+                    <span className="text-2xl sm:text-3xl">{option.icon}</span>
+                    <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-red-50 text-[#B8001F] border border-red-200">
+                      {option.badge}
+                    </span>
                   </div>
 
-                  <div className={`${option.color || 'bg-[#0A2558]'} py-3 sm:py-4 px-2.5 text-center text-white flex flex-col justify-center items-center min-h-[56px] sm:min-h-[64px] group-hover:brightness-105 transition-all shadow-xs`}>
-                    <span className="font-extrabold text-sm sm:text-base tracking-tight leading-snug">
-                      {option.title}
-                    </span>
-                    {option.shortTag && (
-                      <span className="text-[10px] sm:text-xs text-white/80 font-medium leading-tight mt-0.5">
-                        {option.shortTag}
-                      </span>
-                    )}
+                  <h3 className="text-base sm:text-lg font-black text-[#111827] mb-1 group-hover:text-[#B8001F] transition-colors">
+                    {option.title}
+                  </h3>
+
+                  <p className="text-xs sm:text-sm text-slate-500 leading-relaxed mb-3">
+                    {option.subtitle}
+                  </p>
+
+                  <div className="mt-auto pt-2 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-[#B8001F]">
+                    <span>{option.shortTag}</span>
+                    <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </button>
               ))}
             </div>
           )}
 
-          {/* QUESTION 3: PLOT SIZES & PRICING (DYNAMIC BRANCHING) */}
-          {currentQ.id === 'q3' && (() => {
-            const plotOptions = isMilitary ? currentQ.militaryOptions : currentQ.civilianOptions;
-
-            return (
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4.5 max-w-3xl mx-auto w-full">
-                {plotOptions.map((plot) => (
-                  <button
-                    key={plot.id}
-                    onClick={() => handleSelectQuizStep(currentQ.id, plot)}
-                    className="group flex flex-col rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-200 hover:-translate-y-1 hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-blue-900/20 cursor-pointer bg-white border border-slate-200/90 text-left"
-                  >
-                    {/* Top Plot Spec Header */}
-                    <div className="p-3.5 sm:p-4 bg-gradient-to-b from-white to-[#F8FAFC] border-b border-slate-100 flex-1 flex flex-col justify-between">
-                      <div className="flex items-center justify-between gap-1 mb-2">
-                        <span className="text-xl sm:text-2xl">{plot.icon || '🏡'}</span>
-                        <span className={`text-[9px] sm:text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${isMilitary ? 'bg-amber-100 text-amber-900' : 'bg-blue-100 text-blue-900'}`}>
-                          {plot.badge || (isMilitary ? 'Military' : 'Civilian')}
-                        </span>
-                      </div>
-
-                      <div>
-                        <span className="font-black text-base sm:text-lg text-[#0A2558] tracking-tight block">
-                          {plot.size}
-                        </span>
-                        <span className="text-[11px] sm:text-xs text-slate-500 font-semibold block leading-tight">
-                          {plot.shortTag}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Bottom Action Bar with Big Bold Price */}
-                    <div className={`${isMilitary ? 'bg-[#0A2558]' : 'bg-[#185ADB]'} py-3 sm:py-3.5 px-3 text-center text-white flex items-center justify-center gap-1.5 group-hover:brightness-110 transition-all shadow-xs`}>
-                      <span className="text-xs sm:text-sm font-medium text-white/80">Price:</span>
-                      <span className="font-black text-sm sm:text-base tracking-tight text-white">
-                        {plot.price}
+          {/* QUESTION 3: THE 4 PLOTS & 50% PRICING MATRIX */}
+          {currentQ.id === 'q3' && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-3xl mx-auto w-full">
+              {currentQ.options.map((plot) => (
+                <button
+                  key={plot.id}
+                  onClick={() => handleSelectQuizStep(currentQ.id, plot)}
+                  className="group flex flex-col rounded-2xl bg-white border-2 border-slate-200 hover:border-[#B8001F] shadow-sm hover:shadow-2xl transition-all duration-200 hover:-translate-y-1 text-left cursor-pointer overflow-hidden"
+                >
+                  {/* Top Dark Header Bar (From Flyer) */}
+                  <div className="bg-[#111827] text-white p-3 sm:p-3.5 flex items-center justify-between">
+                    <div>
+                      <span className="text-base sm:text-lg font-black tracking-tight block">
+                        {plot.size}
+                      </span>
+                      <span className="text-[10px] sm:text-xs text-slate-300 uppercase tracking-wider font-semibold">
+                        {plot.buildingType}
                       </span>
                     </div>
-                  </button>
-                ))}
-              </div>
-            );
-          })()}
+                    <span className="text-xs font-black uppercase px-2.5 py-1 rounded-md bg-[#B8001F] text-white">
+                      50% OFF
+                    </span>
+                  </div>
 
-          {/* QUESTION 4: INSPECTION & VISIT AVAILABILITY */}
+                  {/* Body Content */}
+                  <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between bg-gradient-to-b from-white to-[#F8FAFC]">
+                    
+                    {/* Pricing Grid */}
+                    <div className="space-y-2 mb-4">
+                      
+                      {/* Presale Outright (Big Bold Red) */}
+                      <div className="bg-red-50 border border-red-200 rounded-xl p-2.5 text-center">
+                        <span className="text-[9px] uppercase font-black text-[#B8001F] tracking-wider block">
+                          PRESALE (OUTRIGHT)
+                        </span>
+                        <span className="text-2xl sm:text-3xl font-black text-[#B8001F] tracking-tight block">
+                          {plot.price}
+                        </span>
+                      </div>
+
+                      {/* 3-Month Plan & Actual Price */}
+                      <div className="grid grid-cols-2 gap-2 text-center text-xs">
+                        <div className="bg-slate-100 rounded-lg p-2 border border-slate-200">
+                          <span className="text-[9px] uppercase font-bold text-slate-500 block">3-Month Plan</span>
+                          <span className="text-xs sm:text-sm font-black text-slate-900">{plot.threeMonthPlan}</span>
+                        </div>
+                        <div className="bg-slate-100 rounded-lg p-2 border border-slate-200">
+                          <span className="text-[9px] uppercase font-bold text-slate-500 block">Actual Price</span>
+                          <span className="text-xs sm:text-sm font-bold text-slate-400 line-through decoration-red-600 decoration-2">
+                            {plot.actualPrice}
+                          </span>
+                        </div>
+                      </div>
+
+                    </div>
+
+                    <p className="text-xs text-slate-600 leading-relaxed mb-3">
+                      {plot.subtitle}
+                    </p>
+
+                    <div className="pt-2.5 border-t border-slate-200 flex items-center justify-between text-xs font-black text-[#B8001F] group-hover:text-[#8B0000]">
+                      <span>Select This Plot ({plot.savings})</span>
+                      <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </div>
+
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* QUESTION 4: INSPECTION / CONSULTATION */}
           {currentQ.id === 'q4' && (
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 max-w-3xl mx-auto w-full">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4 max-w-2xl mx-auto w-full">
               {currentQ.options.map((option) => (
                 <button
                   key={option.id}
                   onClick={() => handleSelectQuizStep(currentQ.id, option)}
-                  className="group flex flex-col rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-200 hover:-translate-y-1 hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-blue-900/20 cursor-pointer bg-white border border-slate-200/90 text-left"
+                  className="group flex flex-col p-5 rounded-2xl bg-white border border-slate-200 hover:border-[#B8001F] shadow-sm hover:shadow-xl transition-all duration-200 hover:-translate-y-1 text-left cursor-pointer"
                 >
-                  <div className="p-4 sm:p-5 bg-gradient-to-b from-white to-[#F8FAFC] border-b border-slate-100 flex-1 flex flex-col items-center text-center justify-center">
-                    <span className="text-3xl sm:text-4xl mb-2 group-hover:scale-110 transition-transform">
-                      {option.icon}
-                    </span>
-                    <span className="font-black text-sm sm:text-base text-[#0A2558] tracking-tight">
-                      {option.title}
-                    </span>
-                    <span className="text-[11px] text-slate-500 font-medium mt-1 leading-tight">
-                      {option.shortTag}
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <span className="text-2xl">{option.icon}</span>
+                    <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-red-50 text-[#B8001F] border border-red-200">
+                      {option.badge}
                     </span>
                   </div>
 
-                  <div className={`${option.color || 'bg-[#0A2558]'} py-2.5 px-2 text-center text-white text-xs font-black tracking-wider uppercase group-hover:brightness-110 transition-all shadow-xs`}>
-                    <span>Select Slot →</span>
-                  </div>
+                  <h3 className="text-base font-black text-[#111827] mb-0.5 group-hover:text-[#B8001F] transition-colors">
+                    {option.title}
+                  </h3>
+                  <span className="text-xs font-bold text-slate-400 mb-2">{option.shortTag}</span>
+
+                  <p className="text-xs text-slate-600 leading-relaxed">
+                    {option.subtitle}
+                  </p>
                 </button>
               ))}
             </div>
           )}
 
         </main>
+
+        {/* FOOTER */}
+        <footer className="border-t border-slate-200 bg-white py-4 px-4 text-center text-xs text-slate-500">
+          <p>Arewa Residences • Beacon Corporate Realty Ltd</p>
+        </footer>
       </div>
     );
   }
 
   // --------------------------------------------------------------------------
-  // SCREEN 3: LIVE ANALYZING (NBCCL 2-SECOND CALCULATION)
+  // SCREEN 3: ANALYZING ANIMATION (PERSPECTIVE ENGINE)
   // --------------------------------------------------------------------------
   if (screen === 'ANALYZING') {
-    const isMilitary = answers.q2?.categoryKey === 'MILITARY' || answers.q2?.title?.includes('Military');
     const stages = [
-      `Reviewing your ${isMilitary ? "Military statutory" : "Civilian"} qualification...`,
-      "Verifying Cadastral Zone, Apo plot allocations...",
-      `Applying official ${isMilitary ? "subsidized Armed Forces rates" : "opening prices"}...`,
-      "Preparing your VIP property reservation & inspection pass!"
+      "Checking Arewa Residences presale plot availability in New Millennium City...",
+      "Applying 50% early-bird discount & calculating outright savings...",
+      "Verifying C of O title documentation and tarred road frontage...",
+      "Reserving your VIP Site Inspection & Allocation Pass..."
     ];
 
     return (
-      <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center px-4 font-sans text-[#0F172A]">
+      <div className="min-h-screen bg-white text-[#0F172A] flex flex-col justify-center items-center px-4 py-12 font-sans selection:bg-[#B8001F] selection:text-white">
         <div className="max-w-md w-full text-center">
           
-          {/* Animated Spinner */}
+          {/* Beacon Logo */}
+          <div className="mb-8">
+            <img 
+              src="/beacon-logo.png" 
+              alt="Beacon Corporate Realty" 
+              className="h-12 w-auto mx-auto object-contain"
+              onError={(e) => { e.target.style.display = 'none'; }}
+            />
+          </div>
+
+          {/* Spinner Ring in Crimson */}
           <div className="relative w-24 h-24 mx-auto mb-8">
-            <div className="absolute inset-0 rounded-full border-4 border-slate-200"></div>
-            <div 
-              className="absolute inset-0 rounded-full border-4 border-[#0A2558] border-t-transparent animate-spin"
-            ></div>
-            <div className="absolute inset-0 flex items-center justify-center font-black text-xl text-[#0A2558]">
+            <div className="w-24 h-24 rounded-full border-4 border-red-100 border-t-[#B8001F] animate-spin"></div>
+            <div className="absolute inset-0 flex items-center justify-center font-black text-xl text-[#B8001F]">
               {analyzingProgress}%
             </div>
           </div>
 
-          <h2 className="text-2xl sm:text-3xl font-black text-[#0A2558] mb-3 tracking-tight">
-            Matching Your Apo Property Allocation...
+          <h2 className="text-2xl font-black text-[#111827] mb-2 tracking-tight">
+            Allocating Presale Plot...
           </h2>
 
-          <p className="text-sm font-bold text-[#185ADB] h-6 transition-all duration-300">
+          <p className="text-sm font-semibold text-slate-600 min-h-[48px] px-4 leading-relaxed animate-pulse">
             {stages[analyzingStage]}
           </p>
 
-          <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden mt-6">
+          <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden mt-6 border border-slate-200">
             <div 
-              className="bg-[#0A2558] h-full transition-all duration-200 ease-out rounded-full"
+              className="bg-gradient-to-r from-[#B8001F] to-[#DC2626] h-full transition-all duration-200 rounded-full"
               style={{ width: `${analyzingProgress}%` }}
             ></div>
           </div>
@@ -853,13 +897,15 @@ export default function App() {
   }
 
   // --------------------------------------------------------------------------
-  // SCREEN 4: OPT-IN & APPOINTMENT BOOKING (NBCCL & APO)
+  // SCREEN 4: OPT-IN & APPOINTMENT BOOKING (AREWA RESIDENCES)
   // --------------------------------------------------------------------------
   if (screen === 'OPT_IN') {
-    const isMilitary = answers.q2?.categoryKey === 'MILITARY' || answers.q2?.title?.includes('Military');
-    const categoryTitle = answers.q2?.title || (isMilitary ? 'Military Personnel' : 'Civilian');
-    const selectedPlot = answers.q3?.title || '250 SQM Plot';
-    const selectedPrice = answers.q3?.price || (isMilitary ? '₦13.5M' : '₦16M');
+    const selectedObjective = answers.q2?.title || 'Buy & Build (Family Residence)';
+    const selectedPlot = answers.q3?.title || '250 SQM (₦5.5M Presale)';
+    const selectedPlotSize = answers.q3?.size || '250 SQM';
+    const selectedPrice = answers.q3?.price || '₦5.5M';
+    const selectedActual = answers.q3?.actualPrice || '₦11M';
+    const selectedPlan = answers.q3?.threeMonthPlan || '₦7.5M';
     const inspectionTime = answers.q4?.title || 'Flexible';
 
     const filteredCountries = countrySearch.trim()
@@ -880,30 +926,30 @@ export default function App() {
     const calendarUrl = `${CONFIG.leadCaptureConfig.ghlCalendarEmbedUrl}?${calendarParams}`;
 
     return (
-      <div className="min-h-screen bg-white text-[#0F172A] flex flex-col justify-center px-4 py-10 sm:py-16 font-sans">
+      <div className="min-h-screen bg-white text-[#0F172A] flex flex-col justify-center px-4 py-8 sm:py-12 font-sans selection:bg-[#B8001F] selection:text-white">
         
         {/* Minimal header */}
-        <div className="max-w-xl mx-auto w-full flex items-center justify-between mb-6 sm:mb-10">
-          <div className="flex items-center gap-3">
+        <div className="max-w-xl mx-auto w-full flex items-center justify-between mb-6 sm:mb-8">
+          <div className="flex items-center gap-2.5">
             <img 
-              src="/nbccl-logo.svg" 
-              alt="NBCCL Crest" 
-              className="h-10 sm:h-11 w-auto object-contain shrink-0"
+              src="/beacon-logo.png" 
+              alt="Beacon Corporate Realty" 
+              className="h-9 sm:h-10 w-auto object-contain shrink-0"
               onError={(e) => { e.target.style.display = 'none'; }}
             />
             <div>
-              <span className="text-xs sm:text-sm font-black text-[#0A2558] block leading-tight">
-                NAVAL BUILDING &amp; CONSTRUCTION
+              <span className="text-xs sm:text-sm font-black text-[#111827] block leading-tight">
+                BEACON CORPORATE REALTY LTD
               </span>
-              <span className="text-[10px] font-bold text-slate-500 uppercase block">
-                COMPANY LIMITED (NBCCL)
+              <span className="text-[10px] font-semibold text-[#B8001F] uppercase block">
+                Arewa Residences • Kaduna
               </span>
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-200">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Cadastral Verified</span>
+          <div className="flex items-center gap-1.5 text-xs font-bold text-[#78350F] bg-amber-50 px-3 py-1.5 rounded-full border border-amber-300">
+            <Award className="w-3.5 h-3.5 text-[#D4AF37] fill-[#D4AF37]" />
+            <span>C OF O TITLE</span>
           </div>
         </div>
 
@@ -911,18 +957,18 @@ export default function App() {
           
           {hasSubmittedDetails ? (
             /* ───────────────────────────────────────────────────────────── */
-            /* CONFIRMATION VIEW (WHEN DETAILS SUBMITTED)                   */
+            /* CONFIRMATION VIEW (DETAILS SUBMITTED)                         */
             /* ───────────────────────────────────────────────────────────── */
             <div className="text-center py-4 animate-fade-in">
-              <div className="w-16 h-16 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
+              <div className="w-16 h-16 bg-red-100 text-[#B8001F] rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
                 <CheckCircle2 className="w-9 h-9" />
               </div>
 
-              <h1 className="text-2xl sm:text-3xl font-black text-[#0A2558] tracking-tight mb-2">
+              <h1 className="text-2xl sm:text-3xl font-black text-[#111827] tracking-tight mb-2">
                 Viewing Appointment Requested!
               </h1>
               <p className="text-sm text-slate-600 mb-6">
-                Thank you, <strong className="text-slate-900">{leadData.name}</strong>. Please select your specific time slot on the calendar below:
+                Thank you, <strong className="text-slate-900">{leadData.name}</strong>. Please select your specific inspection time slot on the calendar below:
               </p>
 
               {/* Action Button: Calendar Booking Focused */}
@@ -930,32 +976,32 @@ export default function App() {
                 <button
                   onClick={() => {
                     setIsCalendarModalOpen(true);
-                    trackScheduleOpened("Navy Estate Innovation City");
+                    trackScheduleOpened("Arewa Residences, Kaduna");
                   }}
-                  className="w-full sm:w-auto bg-[#0A2558] hover:bg-[#07193C] text-white font-extrabold px-10 py-4.5 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-200 flex items-center justify-center gap-2.5 text-base sm:text-lg cursor-pointer group hover:scale-[1.02] active:scale-[0.98]"
+                  className="w-full sm:w-auto bg-gradient-to-r from-[#B8001F] to-[#8B0000] hover:brightness-110 text-white font-extrabold px-10 py-4.5 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-200 flex items-center justify-center gap-2.5 text-base sm:text-lg cursor-pointer group hover:scale-[1.02] active:scale-[0.98]"
                 >
                   <Calendar className="w-5 h-5 group-hover:rotate-6 transition-transform" />
                   <span>Open Calendar to Pick Date &amp; Time 🗓️</span>
                 </button>
               </div>
 
-              {/* Matched Estate Summary Card */}
+              {/* Summary Card */}
               <div className="bg-[#F8FAFC] rounded-3xl border border-slate-200 p-4 sm:p-5 text-left shadow-xs">
                 <div className="flex items-center gap-3.5 mb-3.5">
                   <img 
-                    src="/innovation-city.jpg" 
-                    alt="Navy Estate Innovation City"
+                    src="/arewa-estate-hero.jpg" 
+                    alt="Arewa Residences" 
                     className="w-20 h-20 rounded-2xl object-cover border border-slate-200 shrink-0"
                   />
                   <div>
-                    <span className="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-[#EEF4FC] text-[#0A2558] border border-[#CBDDF7]">
-                      {categoryTitle}
+                    <span className="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-red-50 text-[#B8001F] border border-red-200">
+                      50% Presale Confirmed
                     </span>
-                    <h3 className="text-base sm:text-lg font-black text-[#0A2558] mt-1">
-                      Navy Estate Innovation City
+                    <h3 className="text-base sm:text-lg font-black text-[#111827] mt-1">
+                      Arewa Residences
                     </h3>
                     <p className="text-xs text-slate-500 font-medium">
-                      Cadastral Zone, Apo, Abuja • NBCCL
+                      New Millennium City, Kaduna • Directly on Tarred Road
                     </p>
                   </div>
                 </div>
@@ -963,11 +1009,11 @@ export default function App() {
                 <div className="grid grid-cols-3 gap-2 text-center pt-3 border-t border-slate-200">
                   <div className="bg-white p-2.5 rounded-xl border border-slate-200/80">
                     <span className="text-[9px] uppercase font-bold text-slate-400 block">Plot Size</span>
-                    <span className="text-xs font-black text-slate-900">{answers.q3?.size || '250 SQM'}</span>
+                    <span className="text-xs font-black text-slate-900">{selectedPlotSize}</span>
                   </div>
                   <div className="bg-white p-2.5 rounded-xl border border-slate-200/80">
-                    <span className="text-[9px] uppercase font-bold text-slate-400 block">Allocation Rate</span>
-                    <span className="text-xs font-black text-[#0A2558]">{selectedPrice}</span>
+                    <span className="text-[9px] uppercase font-bold text-slate-400 block">Presale Rate</span>
+                    <span className="text-xs font-black text-[#B8001F]">{selectedPrice}</span>
                   </div>
                   <div className="bg-white p-2.5 rounded-xl border border-slate-200/80">
                     <span className="text-[9px] uppercase font-bold text-slate-400 block">Inspection</span>
@@ -982,27 +1028,31 @@ export default function App() {
             /* APPOINTMENT REQUEST FORM (INITIAL STEP)                       */
             /* ───────────────────────────────────────────────────────────── */
             <div>
+              {/* Top Countdown Urgency Banner */}
+              <div className="mb-4 bg-red-50 border border-red-200 rounded-2xl p-3 flex items-center justify-between text-xs">
+                <div className="flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-[#B8001F] animate-pulse" />
+                  <span className="font-bold text-slate-700">Holding 50% Presale Price:</span>
+                </div>
+                <span className="font-black text-[#B8001F] text-sm tracking-wider font-mono">
+                  {formatTimer(timeLeft)}
+                </span>
+              </div>
+
               {/* Top Eyebrow & Notice */}
-              <div className="text-center mb-6 sm:mb-8">
-                <p className="text-xs sm:text-sm font-extrabold text-[#0A2558] tracking-wide uppercase mb-2">
-                  Great, thanks for your valuable input!
+              <div className="text-center mb-6">
+                <p className="text-xs sm:text-sm font-extrabold text-[#B8001F] tracking-wide uppercase mb-1">
+                  Great, your presale allocation is matched!
                 </p>
                 
-                <h1 className="text-2xl sm:text-4xl font-black text-[#0A2558] tracking-tight mb-2.5">
-                  Request Your Private Viewing Appointment
+                <h1 className="text-2xl sm:text-3xl font-black text-[#111827] tracking-tight mb-2">
+                  Request Your Guided Site Inspection
                 </h1>
 
                 {/* Offer Match Tag directly on form */}
-                <div className="inline-flex items-center gap-2 bg-[#EEF4FC] border border-[#CBDDF7] text-[#0A2558] px-4 py-1.5 rounded-full text-xs font-bold mb-3 shadow-2xs">
-                  <Sparkles className="w-3.5 h-3.5 text-[#C59B27]" />
-                  <span>Matched: {answers.q3?.title || 'Selected Plot'} • {categoryTitle}</span>
-                </div>
-                
-                <div className="flex justify-center">
-                  <div className="inline-flex items-center gap-2 bg-amber-50 border border-amber-200 text-amber-900 px-4 py-1.5 rounded-full text-xs font-bold shadow-2xs mt-1">
-                    <span>⏱️</span>
-                    <span><strong>Last Step:</strong> Please only arrange an inspection if you are actually interested 🤝</span>
-                  </div>
+                <div className="inline-flex items-center gap-2 bg-red-50 border border-red-200 text-[#B8001F] px-4 py-1.5 rounded-full text-xs font-bold mb-2 shadow-2xs">
+                  <Sparkles className="w-3.5 h-3.5 text-[#B8001F]" />
+                  <span>Matched: {selectedPlotSize} @ {selectedPrice} (Save 50% vs ~~{selectedActual}~~)</span>
                 </div>
               </div>
 
@@ -1010,7 +1060,7 @@ export default function App() {
               <form onSubmit={handleLeadSubmit} className="space-y-4">
                 
                 {/* Input 1: Full Name */}
-                <div className="flex items-center bg-white border border-slate-200/90 rounded-2xl px-4 py-3.5 sm:py-4 shadow-2xs hover:border-slate-300 focus-within:border-[#0A2558] focus-within:ring-4 focus-within:ring-blue-900/10 transition-all">
+                <div className="flex items-center bg-white border border-slate-200/90 rounded-2xl px-4 py-3.5 sm:py-4 shadow-2xs hover:border-slate-300 focus-within:border-[#B8001F] focus-within:ring-4 focus-within:ring-red-700/10 transition-all">
                   <User className="w-5 h-5 text-slate-400 shrink-0 mr-3" />
                   <input 
                     type="text"
@@ -1023,7 +1073,7 @@ export default function App() {
                 </div>
 
                 {/* Input 2: International Phone with Flag & Country Code */}
-                <div className="relative flex items-center bg-white border border-slate-200/90 rounded-2xl px-3 sm:px-4 py-2 sm:py-2.5 shadow-2xs hover:border-slate-300 focus-within:border-[#0A2558] focus-within:ring-4 focus-within:ring-blue-900/10 transition-all">
+                <div className="relative flex items-center bg-white border border-slate-200/90 rounded-2xl px-3 sm:px-4 py-2 sm:py-2.5 shadow-2xs hover:border-slate-300 focus-within:border-[#B8001F] focus-within:ring-4 focus-within:ring-red-700/10 transition-all">
                   
                   {/* Flag & Dial Code Trigger Button */}
                   <button 
@@ -1041,7 +1091,7 @@ export default function App() {
                   <input 
                     type="tel"
                     required
-                    placeholder="Phone number of contact person"
+                    placeholder="Phone number / WhatsApp"
                     value={phoneSubscriber}
                     onChange={(e) => setPhoneSubscriber(e.target.value)}
                     className="w-full bg-transparent text-slate-900 placeholder:text-slate-400 font-medium outline-none text-sm sm:text-base py-1.5"
@@ -1078,7 +1128,7 @@ export default function App() {
                               setCountrySearch('');
                             }}
                             className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-left text-xs transition-colors cursor-pointer ${
-                              selectedCountry.code === c.code ? 'bg-blue-50 text-[#0A2558] font-bold' : 'hover:bg-slate-50 text-slate-800'
+                              selectedCountry.code === c.code ? 'bg-red-50 text-[#B8001F] font-bold' : 'hover:bg-slate-50 text-slate-800'
                             }`}
                           >
                             <div className="flex items-center gap-2">
@@ -1094,7 +1144,7 @@ export default function App() {
                 </div>
 
                 {/* Input 3: Email Address */}
-                <div className="flex items-center bg-white border border-slate-200/90 rounded-2xl px-4 py-3.5 sm:py-4 shadow-2xs hover:border-slate-300 focus-within:border-[#0A2558] focus-within:ring-4 focus-within:ring-blue-900/10 transition-all">
+                <div className="flex items-center bg-white border border-slate-200/90 rounded-2xl px-4 py-3.5 sm:py-4 shadow-2xs hover:border-slate-300 focus-within:border-[#B8001F] focus-within:ring-4 focus-within:ring-red-700/10 transition-all">
                   <Mail className="w-5 h-5 text-slate-400 shrink-0 mr-3" />
                   <input 
                     type="email"
@@ -1113,24 +1163,24 @@ export default function App() {
                     required
                     checked={agreedPolicy}
                     onChange={(e) => setAgreedPolicy(e.target.checked)}
-                    className="w-4 h-4 mt-0.5 rounded border-slate-300 text-[#0A2558] focus:ring-[#0A2558] cursor-pointer" 
+                    className="w-4 h-4 mt-0.5 rounded border-slate-300 text-[#B8001F] focus:ring-[#B8001F] cursor-pointer" 
                   />
                   <label htmlFor="privacy_policy" className="text-xs sm:text-sm text-slate-600 font-medium cursor-pointer leading-relaxed">
                     I understand and accept the <span className="underline text-slate-800">privacy policy</span>.
                   </label>
                 </div>
 
-                {/* Submit Button (Official NBCCL Navy) */}
+                {/* Submit Button (Flyer Crimson Gradient) */}
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-[#0A2558] hover:bg-[#07193C] active:scale-[0.99] text-white rounded-2xl py-4 px-6 shadow-xl hover:shadow-2xl transition-all duration-200 flex flex-col items-center justify-center cursor-pointer disabled:opacity-50 mt-4 group"
+                  className="w-full bg-gradient-to-r from-[#B8001F] via-[#DC2626] to-[#8B0000] hover:brightness-110 active:scale-[0.99] text-white rounded-2xl py-4 px-6 shadow-xl hover:shadow-2xl transition-all duration-200 flex flex-col items-center justify-center cursor-pointer disabled:opacity-50 mt-4 group"
                 >
                   <span className="text-lg sm:text-xl font-black tracking-tight flex items-center gap-2">
                     {isSubmitting ? 'Opening Calendar...' : 'Open the calendar now 🗓️'}
                   </span>
                   <span className="text-xs sm:text-sm font-medium text-white/90 mt-0.5">
-                    and book your private site inspection
+                    and book your private site inspection tour
                   </span>
                 </button>
 
@@ -1139,7 +1189,7 @@ export default function App() {
               {/* Confidential Notice */}
               <div className="mt-6 text-center text-xs text-slate-400 flex items-center justify-center gap-2">
                 <Lock className="w-3.5 h-3.5 text-slate-400" />
-                <span>100% Confidential • Official NBCCL Development Representative</span>
+                <span>100% Confidential • Official Beacon Corporate Realty Representative</span>
               </div>
             </div>
           )}
@@ -1156,12 +1206,12 @@ export default function App() {
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <h3 className="text-base sm:text-lg font-black text-[#0A2558] tracking-tight">
-                      Schedule Your Private Viewing Appointment
+                    <h3 className="text-base sm:text-lg font-black text-[#111827] tracking-tight">
+                      Schedule Your Private Viewing Tour
                     </h3>
                   </div>
                   <p className="text-xs text-slate-500 font-medium mt-0.5">
-                    Naval Building &amp; Construction Company Limited (NBCCL) • Apo Site or Asokoro Liaison Office
+                    Beacon Corporate Realty Ltd • Arewa Residences, New Millennium City, Kaduna
                   </p>
                 </div>
 
@@ -1178,7 +1228,7 @@ export default function App() {
               <div className="flex-1 w-full bg-white relative overflow-hidden">
                 <iframe 
                   src={calendarUrl}
-                  title="Navy Estate Private Inspection Calendar"
+                  title="Arewa Residences Private Inspection Calendar"
                   className="w-full h-full border-0"
                 />
               </div>
@@ -1187,11 +1237,11 @@ export default function App() {
               <div className="px-5 py-3 border-t border-slate-100 bg-[#F8FAFC] flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500">
                 <div className="flex items-center gap-2">
                   <Lock className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>Reservation confirmed to your phone / WhatsApp ({leadData.phone || phoneSubscriber})</span>
+                  <span>Reservation confirmed to your WhatsApp ({leadData.phone || phoneSubscriber})</span>
                 </div>
                 <button
                   onClick={() => setIsCalendarModalOpen(false)}
-                  className="text-xs font-bold text-slate-700 hover:text-[#0A2558] underline cursor-pointer"
+                  className="text-xs font-bold text-[#B8001F] hover:underline cursor-pointer"
                 >
                   Done / Close Calendar →
                 </button>
