@@ -28,7 +28,7 @@ export const CONFIG = {
   // LEAD CAPTURE SETTINGS
   leadCaptureConfig: {
     webhookUrl: "https://services.leadconnectorhq.com/hooks/aTC64ND4XQDWNEekVZeZ/webhook-trigger/b5yTvVxuEUgAZG2ZCnxu",
-    ghlCalendarEmbedUrl: "https://api.leadconnectorhq.com/widget/bookings/arewa-residences-kaduna-inspec",
+    ghlCalendarEmbedUrl: "https://api.leadconnectorhq.com/widget/booking/iH5WWBsPwKTMMmt24JbO",
     whatsappSalesNumber: "2348030000000",
     fields: {
       name: { show: true, required: true },
