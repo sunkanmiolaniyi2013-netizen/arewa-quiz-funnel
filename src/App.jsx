@@ -35,7 +35,10 @@ import {
   Compass,
   Home,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  CheckCheck,
+  MoreVertical,
+  MessageSquare
 } from 'lucide-react';
 import { CONFIG } from './quizConfig';
 import { 
@@ -142,6 +145,29 @@ export default function App() {
     detectCountry();
   }, []);
 
+  // Listen for GHL calendar appointment booking completion
+  useEffect(() => {
+    const handleMessage = (event) => {
+      try {
+        const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+        if (
+          data?.type === 'booking_successful' || 
+          data?.action === 'booking_success' || 
+          data?.event === 'appointment_booked' ||
+          data?.msg === 'appointment_booked' ||
+          data?.status === 'confirmed'
+        ) {
+          setScreen('THANK_YOU');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      } catch (e) {
+        // Ignore non-json postMessages
+      }
+    };
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
+
   // Track step & question views for Funnel Analytics
   useEffect(() => {
     if (screen === 'PAGE_1') {
@@ -153,6 +179,10 @@ export default function App() {
       }
     } else if (screen === 'OPT_IN') {
       trackQuestionViewed('optin', 'Arewa Residences Presale Opt-In Form');
+    } else if (screen === 'CALENDAR') {
+      trackQuestionViewed('calendar', 'VIP Site Inspection Calendar Booking');
+    } else if (screen === 'THANK_YOU') {
+      trackQuestionViewed('thank_you', 'Reservation Confirmed - WhatsApp Clearance Instructions');
     }
   }, [screen, currentStepIdx]);
 
@@ -319,7 +349,8 @@ export default function App() {
     setTimeout(() => {
       setIsSubmitting(false);
       setHasSubmittedDetails(true);
-      setIsCalendarModalOpen(true);
+      setScreen('CALENDAR');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }, 400);
   };
 
@@ -652,7 +683,7 @@ export default function App() {
     const progressPercent = Math.round(((currentStepIdx + 1) / CONFIG.questions.length) * 100);
 
     return (
-      <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A] flex flex-col font-sans selection:bg-[#B8001F] selection:text-white">
+      <div className="min-h-screen bg-slate-100/90 text-[#0F172A] flex flex-col font-sans selection:bg-[#B8001F] selection:text-white">
         
         {/* TOP HEADER WITH BACK & STEP PROGRESS */}
         <header className="px-4 py-3 sm:py-4 sm:px-8 max-w-5xl mx-auto w-full flex items-center justify-between border-b border-slate-200/80 bg-white/90 backdrop-blur-md sticky top-0 z-30">
@@ -702,31 +733,33 @@ export default function App() {
 
           {/* QUESTION 2: OBJECTIVE CARDS */}
           {currentQ.id === 'q2' && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-5 max-w-2xl mx-auto w-full">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 max-w-2xl mx-auto w-full">
               {currentQ.options.map((option) => (
                 <button
                   key={option.id}
                   onClick={() => handleSelectQuizStep(currentQ.id, option)}
-                  className="group flex flex-col p-5 rounded-2xl bg-white border border-slate-200 hover:border-[#B8001F] shadow-sm hover:shadow-xl transition-all duration-200 hover:-translate-y-1 text-left cursor-pointer"
+                  className="group flex flex-col p-5 sm:p-6 rounded-2xl bg-white border-2 border-slate-300 hover:border-[#B8001F] shadow-sm hover:shadow-2xl transition-all duration-200 hover:-translate-y-1 text-left cursor-pointer relative"
                 >
                   <div className="flex items-center justify-between gap-2 mb-3">
-                    <span className="text-2xl sm:text-3xl">{option.icon}</span>
-                    <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-red-50 text-[#B8001F] border border-red-200">
+                    <div className="w-12 h-12 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-2xl sm:text-3xl shadow-2xs group-hover:scale-105 transition-transform">
+                      {option.icon}
+                    </div>
+                    <span className="text-[10px] sm:text-xs font-black uppercase tracking-wider px-3 py-1 rounded-full bg-red-50 text-[#B8001F] border border-red-200">
                       {option.badge}
                     </span>
                   </div>
 
-                  <h3 className="text-base sm:text-lg font-black text-[#111827] mb-1 group-hover:text-[#B8001F] transition-colors">
+                  <h3 className="text-base sm:text-lg font-black text-slate-900 mb-1.5 group-hover:text-[#B8001F] transition-colors leading-snug">
                     {option.title}
                   </h3>
 
-                  <p className="text-xs sm:text-sm text-slate-500 leading-relaxed mb-3">
+                  <p className="text-xs sm:text-sm text-slate-700 font-medium leading-relaxed mb-4">
                     {option.subtitle}
                   </p>
 
-                  <div className="mt-auto pt-2 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-[#B8001F]">
+                  <div className="mt-auto pt-3 border-t border-slate-200 flex items-center justify-between text-xs font-black text-[#B8001F]">
                     <span>{option.shortTag}</span>
-                    <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    <ChevronRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform" />
                   </div>
                 </button>
               ))}
@@ -740,7 +773,7 @@ export default function App() {
                 <button
                   key={plot.id}
                   onClick={() => handleSelectQuizStep(currentQ.id, plot)}
-                  className="group flex flex-col rounded-2xl bg-white border-2 border-slate-200 hover:border-[#B8001F] shadow-sm hover:shadow-2xl transition-all duration-200 hover:-translate-y-1 text-left cursor-pointer overflow-hidden"
+                  className="group flex flex-col rounded-2xl bg-white border-2 border-slate-300 hover:border-[#B8001F] shadow-sm hover:shadow-2xl transition-all duration-200 hover:-translate-y-1 text-left cursor-pointer overflow-hidden"
                 >
                   {/* Top Dark Header Bar (From Flyer) */}
                   <div className="bg-[#111827] text-white p-3 sm:p-3.5 flex items-center justify-between">
@@ -789,7 +822,7 @@ export default function App() {
 
                     </div>
 
-                    <p className="text-xs text-slate-600 leading-relaxed mb-3">
+                    <p className="text-xs text-slate-700 font-medium leading-relaxed mb-3">
                       {plot.subtitle}
                     </p>
 
@@ -806,26 +839,28 @@ export default function App() {
 
           {/* QUESTION 4: INSPECTION / CONSULTATION */}
           {currentQ.id === 'q4' && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4 max-w-2xl mx-auto w-full">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto w-full">
               {currentQ.options.map((option) => (
                 <button
                   key={option.id}
                   onClick={() => handleSelectQuizStep(currentQ.id, option)}
-                  className="group flex flex-col p-5 rounded-2xl bg-white border border-slate-200 hover:border-[#B8001F] shadow-sm hover:shadow-xl transition-all duration-200 hover:-translate-y-1 text-left cursor-pointer"
+                  className="group flex flex-col p-5 sm:p-6 rounded-2xl bg-white border-2 border-slate-300 hover:border-[#B8001F] shadow-sm hover:shadow-2xl transition-all duration-200 hover:-translate-y-1 text-left cursor-pointer"
                 >
-                  <div className="flex items-center justify-between gap-2 mb-2">
-                    <span className="text-2xl">{option.icon}</span>
-                    <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-red-50 text-[#B8001F] border border-red-200">
+                  <div className="flex items-center justify-between gap-2 mb-3">
+                    <div className="w-12 h-12 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-2xl sm:text-3xl">
+                      {option.icon}
+                    </div>
+                    <span className="text-[10px] sm:text-xs font-black uppercase tracking-wider px-3 py-1 rounded-full bg-red-50 text-[#B8001F] border border-red-200">
                       {option.badge}
                     </span>
                   </div>
 
-                  <h3 className="text-base font-black text-[#111827] mb-0.5 group-hover:text-[#B8001F] transition-colors">
+                  <h3 className="text-base sm:text-lg font-black text-slate-900 mb-1 group-hover:text-[#B8001F] transition-colors">
                     {option.title}
                   </h3>
-                  <span className="text-xs font-bold text-slate-400 mb-2">{option.shortTag}</span>
+                  <span className="text-xs font-bold text-slate-600 mb-2 block">{option.shortTag}</span>
 
-                  <p className="text-xs text-slate-600 leading-relaxed">
+                  <p className="text-xs sm:text-sm text-slate-700 font-medium leading-relaxed">
                     {option.subtitle}
                   </p>
                 </button>
@@ -897,16 +932,12 @@ export default function App() {
   }
 
   // --------------------------------------------------------------------------
-  // SCREEN 4: OPT-IN & APPOINTMENT BOOKING (AREWA RESIDENCES)
+  // SCREEN 4: OPT-IN DETAILS FORM (AREWA RESIDENCES)
   // --------------------------------------------------------------------------
   if (screen === 'OPT_IN') {
-    const selectedObjective = answers.q2?.title || 'Buy & Build (Family Residence)';
-    const selectedPlot = answers.q3?.title || '250 SQM (₦5.5M Presale)';
     const selectedPlotSize = answers.q3?.size || '250 SQM';
     const selectedPrice = answers.q3?.price || '₦5.5M';
     const selectedActual = answers.q3?.actualPrice || '₦11M';
-    const selectedPlan = answers.q3?.threeMonthPlan || '₦7.5M';
-    const inspectionTime = answers.q4?.title || 'Flexible';
 
     const filteredCountries = countrySearch.trim()
       ? COUNTRIES.filter(c => 
@@ -915,18 +946,8 @@ export default function App() {
         )
       : COUNTRIES;
 
-    // GHL Calendar URL with Pre-filled Lead Parameters
-    const calendarParams = new URLSearchParams({
-      name: (leadData.name || '').trim(),
-      first_name: (leadData.name || '').trim().split(' ')[0],
-      last_name: (leadData.name || '').trim().split(' ').slice(1).join(' '),
-      phone: leadData.phone || `${selectedCountry.dialCode} ${phoneSubscriber.trim()}`,
-      email: (leadData.email || '').trim()
-    }).toString();
-    const calendarUrl = `${CONFIG.leadCaptureConfig.ghlCalendarEmbedUrl}?${calendarParams}`;
-
     return (
-      <div className="min-h-screen bg-white text-[#0F172A] flex flex-col justify-center px-4 py-8 sm:py-12 font-sans selection:bg-[#B8001F] selection:text-white">
+      <div className="min-h-screen bg-slate-100/90 text-[#0F172A] flex flex-col justify-center px-4 py-8 sm:py-12 font-sans selection:bg-[#B8001F] selection:text-white">
         
         {/* Minimal header */}
         <div className="max-w-xl mx-auto w-full flex items-center justify-between mb-6 sm:mb-8">
@@ -955,301 +976,603 @@ export default function App() {
 
         <div className="max-w-xl mx-auto w-full">
           
-          {hasSubmittedDetails ? (
-            /* ───────────────────────────────────────────────────────────── */
-            /* CONFIRMATION VIEW (DETAILS SUBMITTED)                         */
-            /* ───────────────────────────────────────────────────────────── */
-            <div className="text-center py-4 animate-fade-in">
-              <div className="w-16 h-16 bg-red-100 text-[#B8001F] rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
-                <CheckCircle2 className="w-9 h-9" />
+          <div className="bg-white rounded-3xl border-2 border-slate-300 p-6 sm:p-8 shadow-xl">
+            
+            {/* Top Countdown Urgency Banner */}
+            <div className="mb-5 bg-red-50 border border-red-200 rounded-2xl p-3 flex items-center justify-between text-xs">
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-[#B8001F] animate-pulse" />
+                <span className="font-bold text-slate-700">Holding 50% Presale Price:</span>
               </div>
+              <span className="font-black text-[#B8001F] text-sm tracking-wider font-mono">
+                {formatTimer(timeLeft)}
+              </span>
+            </div>
 
-              <h1 className="text-2xl sm:text-3xl font-black text-[#111827] tracking-tight mb-2">
-                Viewing Appointment Requested!
-              </h1>
-              <p className="text-sm text-slate-600 mb-6">
-                Thank you, <strong className="text-slate-900">{leadData.name}</strong>. Please select your specific inspection time slot on the calendar below:
+            {/* Top Eyebrow & Notice */}
+            <div className="text-center mb-6">
+              <p className="text-xs sm:text-sm font-extrabold text-[#B8001F] tracking-wide uppercase mb-1">
+                Great, your presale allocation is matched!
               </p>
-
-              {/* Action Button: Calendar Booking Focused */}
-              <div className="flex justify-center mb-8">
-                <button
-                  onClick={() => {
-                    setIsCalendarModalOpen(true);
-                    trackScheduleOpened("Arewa Residences, Kaduna");
-                  }}
-                  className="w-full sm:w-auto bg-gradient-to-r from-[#B8001F] to-[#8B0000] hover:brightness-110 text-white font-extrabold px-10 py-4.5 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-200 flex items-center justify-center gap-2.5 text-base sm:text-lg cursor-pointer group hover:scale-[1.02] active:scale-[0.98]"
-                >
-                  <Calendar className="w-5 h-5 group-hover:rotate-6 transition-transform" />
-                  <span>Open Calendar to Pick Date &amp; Time 🗓️</span>
-                </button>
-              </div>
-
-              {/* Summary Card */}
-              <div className="bg-[#F8FAFC] rounded-3xl border border-slate-200 p-4 sm:p-5 text-left shadow-xs">
-                <div className="flex items-center gap-3.5 mb-3.5">
-                  <img 
-                    src="/arewa-estate-hero.jpg" 
-                    alt="Arewa Residences" 
-                    className="w-20 h-20 rounded-2xl object-cover border border-slate-200 shrink-0"
-                  />
-                  <div>
-                    <span className="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-red-50 text-[#B8001F] border border-red-200">
-                      50% Presale Confirmed
-                    </span>
-                    <h3 className="text-base sm:text-lg font-black text-[#111827] mt-1">
-                      Arewa Residences
-                    </h3>
-                    <p className="text-xs text-slate-500 font-medium">
-                      New Millennium City, Kaduna • Directly on Tarred Road
-                    </p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-3 gap-2 text-center pt-3 border-t border-slate-200">
-                  <div className="bg-white p-2.5 rounded-xl border border-slate-200/80">
-                    <span className="text-[9px] uppercase font-bold text-slate-400 block">Plot Size</span>
-                    <span className="text-xs font-black text-slate-900">{selectedPlotSize}</span>
-                  </div>
-                  <div className="bg-white p-2.5 rounded-xl border border-slate-200/80">
-                    <span className="text-[9px] uppercase font-bold text-slate-400 block">Presale Rate</span>
-                    <span className="text-xs font-black text-[#B8001F]">{selectedPrice}</span>
-                  </div>
-                  <div className="bg-white p-2.5 rounded-xl border border-slate-200/80">
-                    <span className="text-[9px] uppercase font-bold text-slate-400 block">Inspection</span>
-                    <span className="text-xs font-black text-emerald-600">{inspectionTime}</span>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-          ) : (
-            /* ───────────────────────────────────────────────────────────── */
-            /* APPOINTMENT REQUEST FORM (INITIAL STEP)                       */
-            /* ───────────────────────────────────────────────────────────── */
-            <div>
-              {/* Top Countdown Urgency Banner */}
-              <div className="mb-4 bg-red-50 border border-red-200 rounded-2xl p-3 flex items-center justify-between text-xs">
-                <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-[#B8001F] animate-pulse" />
-                  <span className="font-bold text-slate-700">Holding 50% Presale Price:</span>
-                </div>
-                <span className="font-black text-[#B8001F] text-sm tracking-wider font-mono">
-                  {formatTimer(timeLeft)}
-                </span>
-              </div>
-
-              {/* Top Eyebrow & Notice */}
-              <div className="text-center mb-6">
-                <p className="text-xs sm:text-sm font-extrabold text-[#B8001F] tracking-wide uppercase mb-1">
-                  Great, your presale allocation is matched!
-                </p>
-                
-                <h1 className="text-2xl sm:text-3xl font-black text-[#111827] tracking-tight mb-2">
-                  Request Your Guided Site Inspection
-                </h1>
-
-                {/* Offer Match Tag directly on form */}
-                <div className="inline-flex items-center gap-2 bg-red-50 border border-red-200 text-[#B8001F] px-4 py-1.5 rounded-full text-xs font-bold mb-2 shadow-2xs">
-                  <Sparkles className="w-3.5 h-3.5 text-[#B8001F]" />
-                  <span>Matched: {selectedPlotSize} @ {selectedPrice} (Save 50% vs ~~{selectedActual}~~)</span>
-                </div>
-              </div>
-
-              {/* Form matching Perspective Reference */}
-              <form onSubmit={handleLeadSubmit} className="space-y-4">
-                
-                {/* Input 1: Full Name */}
-                <div className="flex items-center bg-white border border-slate-200/90 rounded-2xl px-4 py-3.5 sm:py-4 shadow-2xs hover:border-slate-300 focus-within:border-[#B8001F] focus-within:ring-4 focus-within:ring-red-700/10 transition-all">
-                  <User className="w-5 h-5 text-slate-400 shrink-0 mr-3" />
-                  <input 
-                    type="text"
-                    required
-                    placeholder="First and last name"
-                    value={leadData.name}
-                    onChange={(e) => setLeadData({ ...leadData, name: e.target.value })}
-                    className="w-full bg-transparent text-slate-900 placeholder:text-slate-400 font-medium outline-none text-sm sm:text-base"
-                  />
-                </div>
-
-                {/* Input 2: International Phone with Flag & Country Code */}
-                <div className="relative flex items-center bg-white border border-slate-200/90 rounded-2xl px-3 sm:px-4 py-2 sm:py-2.5 shadow-2xs hover:border-slate-300 focus-within:border-[#B8001F] focus-within:ring-4 focus-within:ring-red-700/10 transition-all">
-                  
-                  {/* Flag & Dial Code Trigger Button */}
-                  <button 
-                    type="button"
-                    onClick={() => setCountryDropdownOpen(!countryDropdownOpen)}
-                    className="flex items-center gap-1.5 py-1 px-2 hover:bg-slate-100 rounded-xl transition-all cursor-pointer mr-2 border-r border-slate-200 pr-3 shrink-0"
-                    title="Select country code"
-                  >
-                    <span className="text-xl sm:text-2xl leading-none">{selectedCountry.flag}</span>
-                    <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
-                    <span className="text-xs sm:text-sm font-bold text-slate-700 ml-0.5">{selectedCountry.dialCode}</span>
-                  </button>
-
-                  {/* Phone Input */}
-                  <input 
-                    type="tel"
-                    required
-                    placeholder="Phone number / WhatsApp"
-                    value={phoneSubscriber}
-                    onChange={(e) => setPhoneSubscriber(e.target.value)}
-                    className="w-full bg-transparent text-slate-900 placeholder:text-slate-400 font-medium outline-none text-sm sm:text-base py-1.5"
-                  />
-
-                  {/* Country Dropdown Popover */}
-                  {countryDropdownOpen && (
-                    <>
-                      <div 
-                        className="fixed inset-0 z-40" 
-                        onClick={() => setCountryDropdownOpen(false)}
-                      />
-                      <div className="absolute left-0 top-full mt-2 w-72 sm:w-80 bg-white rounded-2xl shadow-2xl border border-slate-200 z-50 p-2 max-h-64 overflow-y-auto">
-                        <div className="p-1 mb-1">
-                          <div className="flex items-center px-2.5 py-1.5 bg-slate-100 rounded-xl">
-                            <Search className="w-3.5 h-3.5 text-slate-400 mr-2 shrink-0" />
-                            <input 
-                              type="text"
-                              placeholder="Search country or code..."
-                              value={countrySearch}
-                              onChange={(e) => setCountrySearch(e.target.value)}
-                              className="w-full bg-transparent text-xs outline-none text-slate-800"
-                              autoFocus
-                            />
-                          </div>
-                        </div>
-                        {filteredCountries.map((c) => (
-                          <button
-                            key={c.code}
-                            type="button"
-                            onClick={() => {
-                              setSelectedCountry(c);
-                              setCountryDropdownOpen(false);
-                              setCountrySearch('');
-                            }}
-                            className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-left text-xs transition-colors cursor-pointer ${
-                              selectedCountry.code === c.code ? 'bg-red-50 text-[#B8001F] font-bold' : 'hover:bg-slate-50 text-slate-800'
-                            }`}
-                          >
-                            <div className="flex items-center gap-2">
-                              <span className="text-lg">{c.flag}</span>
-                              <span className="truncate">{c.name}</span>
-                            </div>
-                            <span className="font-bold text-slate-500 shrink-0 ml-2">{c.dialCode}</span>
-                          </button>
-                        ))}
-                      </div>
-                    </>
-                  )}
-                </div>
-
-                {/* Input 3: Email Address */}
-                <div className="flex items-center bg-white border border-slate-200/90 rounded-2xl px-4 py-3.5 sm:py-4 shadow-2xs hover:border-slate-300 focus-within:border-[#B8001F] focus-within:ring-4 focus-within:ring-red-700/10 transition-all">
-                  <Mail className="w-5 h-5 text-slate-400 shrink-0 mr-3" />
-                  <input 
-                    type="email"
-                    placeholder="Email address (optional)"
-                    value={leadData.email}
-                    onChange={(e) => setLeadData({ ...leadData, email: e.target.value })}
-                    className="w-full bg-transparent text-slate-900 placeholder:text-slate-400 font-medium outline-none text-sm sm:text-base"
-                  />
-                </div>
-
-                {/* Terms & Privacy Policy Checkbox */}
-                <div className="flex items-start gap-3 pt-1 text-left">
-                  <input 
-                    type="checkbox" 
-                    id="privacy_policy" 
-                    required
-                    checked={agreedPolicy}
-                    onChange={(e) => setAgreedPolicy(e.target.checked)}
-                    className="w-4 h-4 mt-0.5 rounded border-slate-300 text-[#B8001F] focus:ring-[#B8001F] cursor-pointer" 
-                  />
-                  <label htmlFor="privacy_policy" className="text-xs sm:text-sm text-slate-600 font-medium cursor-pointer leading-relaxed">
-                    I understand and accept the <span className="underline text-slate-800">privacy policy</span>.
-                  </label>
-                </div>
-
-                {/* Submit Button (Flyer Crimson Gradient) */}
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full bg-gradient-to-r from-[#B8001F] via-[#DC2626] to-[#8B0000] hover:brightness-110 active:scale-[0.99] text-white rounded-2xl py-4 px-6 shadow-xl hover:shadow-2xl transition-all duration-200 flex flex-col items-center justify-center cursor-pointer disabled:opacity-50 mt-4 group"
-                >
-                  <span className="text-lg sm:text-xl font-black tracking-tight flex items-center gap-2">
-                    {isSubmitting ? 'Opening Calendar...' : 'Open the calendar now 🗓️'}
-                  </span>
-                  <span className="text-xs sm:text-sm font-medium text-white/90 mt-0.5">
-                    and book your private site inspection tour
-                  </span>
-                </button>
-
-              </form>
-
-              {/* Confidential Notice */}
-              <div className="mt-6 text-center text-xs text-slate-400 flex items-center justify-center gap-2">
-                <Lock className="w-3.5 h-3.5 text-slate-400" />
-                <span>100% Confidential • Official Beacon Corporate Realty Representative</span>
-              </div>
-            </div>
-          )}
-
-        </div>
-
-        {/* CALENDAR MODAL OVERLAY */}
-        {isCalendarModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-2.5 sm:p-6 animate-fade-in">
-            <div className="bg-white w-full max-w-3xl h-[94vh] max-h-[820px] rounded-3xl shadow-2xl overflow-hidden flex flex-col border border-slate-200">
               
-              {/* Modal Header */}
-              <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between bg-[#F8FAFC]">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <h3 className="text-base sm:text-lg font-black text-[#111827] tracking-tight">
-                      Schedule Your Private Viewing Tour
-                    </h3>
-                  </div>
-                  <p className="text-xs text-slate-500 font-medium mt-0.5">
-                    Beacon Corporate Realty Ltd • Arewa Residences, New Millennium City, Kaduna
-                  </p>
-                </div>
+              <h1 className="text-2xl sm:text-3xl font-black text-[#111827] tracking-tight mb-2">
+                Request Your Guided Site Inspection
+              </h1>
 
-                <button 
-                  onClick={() => setIsCalendarModalOpen(false)}
-                  className="w-9 h-9 rounded-full bg-slate-200/80 hover:bg-slate-300 text-slate-700 flex items-center justify-center transition-colors cursor-pointer"
-                  title="Close Calendar"
-                >
-                  <X className="w-5 h-5" />
-                </button>
+              {/* Offer Match Tag directly on form */}
+              <div className="inline-flex items-center gap-2 bg-red-50 border border-red-200 text-[#B8001F] px-4 py-1.5 rounded-full text-xs font-bold mb-2 shadow-2xs">
+                <Sparkles className="w-3.5 h-3.5 text-[#B8001F]" />
+                <span>Matched: {selectedPlotSize} @ {selectedPrice} (Save 50% vs ~~{selectedActual}~~)</span>
               </div>
+            </div>
 
-              {/* Modal Calendar Content with Pre-filled Params */}
-              <div className="flex-1 w-full bg-white relative overflow-hidden">
-                <iframe 
-                  src={calendarUrl}
-                  title="Arewa Residences Private Inspection Calendar"
-                  className="w-full h-full border-0"
+            {/* Form */}
+            <form onSubmit={handleLeadSubmit} className="space-y-4">
+              
+              {/* Input 1: Full Name */}
+              <div className="flex items-center bg-white border-2 border-slate-300 rounded-2xl px-4 py-3.5 sm:py-4 shadow-2xs hover:border-slate-400 focus-within:border-[#B8001F] focus-within:ring-4 focus-within:ring-red-700/10 transition-all">
+                <User className="w-5 h-5 text-slate-400 shrink-0 mr-3" />
+                <input 
+                  type="text"
+                  required
+                  placeholder="First and last name"
+                  value={leadData.name}
+                  onChange={(e) => setLeadData({ ...leadData, name: e.target.value })}
+                  className="w-full bg-transparent text-slate-900 placeholder:text-slate-400 font-semibold outline-none text-sm sm:text-base"
                 />
               </div>
 
-              {/* Modal Footer */}
-              <div className="px-5 py-3 border-t border-slate-100 bg-[#F8FAFC] flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500">
-                <div className="flex items-center gap-2">
-                  <Lock className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>Reservation confirmed to your WhatsApp ({leadData.phone || phoneSubscriber})</span>
-                </div>
-                <button
-                  onClick={() => setIsCalendarModalOpen(false)}
-                  className="text-xs font-bold text-[#B8001F] hover:underline cursor-pointer"
+              {/* Input 2: International Phone with Flag & Country Code */}
+              <div className="relative flex items-center bg-white border-2 border-slate-300 rounded-2xl px-3 sm:px-4 py-2 sm:py-2.5 shadow-2xs hover:border-slate-400 focus-within:border-[#B8001F] focus-within:ring-4 focus-within:ring-red-700/10 transition-all">
+                
+                {/* Flag & Dial Code Trigger Button */}
+                <button 
+                  type="button"
+                  onClick={() => setCountryDropdownOpen(!countryDropdownOpen)}
+                  className="flex items-center gap-1.5 py-1 px-2 hover:bg-slate-100 rounded-xl transition-all cursor-pointer mr-2 border-r border-slate-200 pr-3 shrink-0"
+                  title="Select country code"
                 >
-                  Done / Close Calendar →
+                  <span className="text-xl sm:text-2xl leading-none">{selectedCountry.flag}</span>
+                  <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                  <span className="text-xs sm:text-sm font-bold text-slate-700 ml-0.5">{selectedCountry.dialCode}</span>
                 </button>
+
+                {/* Phone Input */}
+                <input 
+                  type="tel"
+                  required
+                  placeholder="Phone number / WhatsApp"
+                  value={phoneSubscriber}
+                  onChange={(e) => setPhoneSubscriber(e.target.value)}
+                  className="w-full bg-transparent text-slate-900 placeholder:text-slate-400 font-semibold outline-none text-sm sm:text-base py-1.5"
+                />
+
+                {/* Country Dropdown Popover */}
+                {countryDropdownOpen && (
+                  <>
+                    <div 
+                      className="fixed inset-0 z-40" 
+                      onClick={() => setCountryDropdownOpen(false)}
+                    />
+                    <div className="absolute left-0 top-full mt-2 w-72 sm:w-80 bg-white rounded-2xl shadow-2xl border-2 border-slate-300 z-50 p-2 max-h-64 overflow-y-auto">
+                      <div className="p-1 mb-1">
+                        <div className="flex items-center px-2.5 py-1.5 bg-slate-100 rounded-xl">
+                          <Search className="w-3.5 h-3.5 text-slate-400 mr-2 shrink-0" />
+                          <input 
+                            type="text"
+                            placeholder="Search country or code..."
+                            value={countrySearch}
+                            onChange={(e) => setCountrySearch(e.target.value)}
+                            className="w-full bg-transparent text-xs outline-none text-slate-800"
+                            autoFocus
+                          />
+                        </div>
+                      </div>
+                      {filteredCountries.map((c) => (
+                        <button
+                          key={c.code}
+                          type="button"
+                          onClick={() => {
+                            setSelectedCountry(c);
+                            setCountryDropdownOpen(false);
+                            setCountrySearch('');
+                          }}
+                          className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-left text-xs transition-colors cursor-pointer ${
+                            selectedCountry.code === c.code ? 'bg-red-50 text-[#B8001F] font-bold' : 'hover:bg-slate-50 text-slate-800'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="text-lg">{c.flag}</span>
+                            <span className="truncate">{c.name}</span>
+                          </div>
+                          <span className="font-bold text-slate-500 shrink-0 ml-2">{c.dialCode}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* Input 3: Email Address */}
+              <div className="flex items-center bg-white border-2 border-slate-300 rounded-2xl px-4 py-3.5 sm:py-4 shadow-2xs hover:border-slate-400 focus-within:border-[#B8001F] focus-within:ring-4 focus-within:ring-red-700/10 transition-all">
+                <Mail className="w-5 h-5 text-slate-400 shrink-0 mr-3" />
+                <input 
+                  type="email"
+                  placeholder="Email address (optional)"
+                  value={leadData.email}
+                  onChange={(e) => setLeadData({ ...leadData, email: e.target.value })}
+                  className="w-full bg-transparent text-slate-900 placeholder:text-slate-400 font-semibold outline-none text-sm sm:text-base"
+                />
+              </div>
+
+              {/* Terms & Privacy Policy Checkbox */}
+              <div className="flex items-start gap-3 pt-1 text-left">
+                <input 
+                  type="checkbox" 
+                  id="privacy_policy" 
+                  required
+                  checked={agreedPolicy}
+                  onChange={(e) => setAgreedPolicy(e.target.checked)}
+                  className="w-4 h-4 mt-0.5 rounded border-slate-300 text-[#B8001F] focus:ring-[#B8001F] cursor-pointer" 
+                />
+                <label htmlFor="privacy_policy" className="text-xs sm:text-sm text-slate-700 font-medium cursor-pointer leading-relaxed">
+                  I understand and accept the <span className="underline text-slate-900 font-bold">privacy policy</span>.
+                </label>
+              </div>
+
+              {/* Submit Button (Advances directly to Calendar) */}
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full bg-gradient-to-r from-[#B8001F] via-[#DC2626] to-[#8B0000] hover:brightness-110 active:scale-[0.99] text-white rounded-2xl py-4 px-6 shadow-xl hover:shadow-2xl transition-all duration-200 flex flex-col items-center justify-center cursor-pointer disabled:opacity-50 mt-4 group"
+              >
+                <span className="text-lg sm:text-xl font-black tracking-tight flex items-center gap-2">
+                  {isSubmitting ? 'Submitting Details...' : 'Continue to Select Date & Time on Calendar 🗓️'}
+                </span>
+                <span className="text-xs sm:text-sm font-medium text-white/90 mt-0.5">
+                  Pick your private VIP site inspection tour slot
+                </span>
+              </button>
+
+            </form>
+
+            {/* Confidential Notice */}
+            <div className="mt-6 text-center text-xs text-slate-500 flex items-center justify-center gap-2">
+              <Lock className="w-3.5 h-3.5 text-slate-400" />
+              <span>100% Confidential • Official Beacon Corporate Realty Representative</span>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    );
+  }
+
+  // --------------------------------------------------------------------------
+  // SCREEN 5: CALENDAR BOOKING (PICK DATE & TIME FOR INSPECTION)
+  // --------------------------------------------------------------------------
+  if (screen === 'CALENDAR') {
+    const cleanPhone = (leadData.phone || `${selectedCountry.dialCode}${phoneSubscriber.trim()}`).replace(/[^\d+]/g, '');
+    const calendarParams = new URLSearchParams({
+      first_name: (leadData.name || '').trim().split(' ')[0],
+      last_name: (leadData.name || '').trim().split(' ').slice(1).join(' ') || (leadData.name || '').trim().split(' ')[0],
+      phone: cleanPhone,
+      email: (leadData.email || '').trim()
+    }).toString();
+    const calendarUrl = `${CONFIG.leadCaptureConfig.ghlCalendarEmbedUrl}?${calendarParams}`;
+
+    return (
+      <div className="min-h-screen bg-slate-100/90 text-[#0F172A] flex flex-col font-sans selection:bg-[#B8001F] selection:text-white">
+        
+        {/* Top Navigation Bar */}
+        <header className="px-4 py-3 sm:py-4 sm:px-8 max-w-4xl mx-auto w-full flex items-center justify-between border-b border-slate-200/80 bg-white/95 backdrop-blur-md sticky top-0 z-30 shadow-xs">
+          <button 
+            onClick={() => setScreen('OPT_IN')}
+            className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-slate-600 hover:text-[#B8001F] transition-colors py-1.5 px-3 rounded-xl hover:bg-slate-100 cursor-pointer"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Back to Details</span>
+          </button>
+
+          <div className="text-xs font-black text-[#B8001F] bg-red-50 border border-red-200 px-3.5 py-1.5 rounded-full shadow-2xs">
+            Step 2 of 2: Inspection Calendar
+          </div>
+
+          <div className="flex items-center gap-1.5 text-xs font-bold text-[#78350F] bg-amber-50 px-3 py-1.5 rounded-full border border-amber-300">
+            <Award className="w-3.5 h-3.5 text-[#D4AF37] fill-[#D4AF37]" />
+            <span>C OF O TITLE</span>
+          </div>
+        </header>
+
+        <main className="flex-1 max-w-3xl mx-auto w-full px-4 sm:px-6 py-6 sm:py-8 flex flex-col">
+          
+          {/* Top Urgency Banner */}
+          <div className="mb-4 bg-red-50 border border-red-200 rounded-2xl p-3 flex items-center justify-between text-xs">
+            <div className="flex items-center gap-2">
+              <Clock className="w-4 h-4 text-[#B8001F] animate-pulse" />
+              <span className="font-bold text-slate-700">Holding 50% Presale Price for {leadData.name ? leadData.name.split(' ')[0] : 'You'}:</span>
+            </div>
+            <span className="font-black text-[#B8001F] text-sm tracking-wider font-mono">
+              {formatTimer(timeLeft)}
+            </span>
+          </div>
+
+          {/* Heading */}
+          <div className="text-center mb-4">
+            <span className="text-xs font-extrabold uppercase tracking-wider text-[#B8001F] bg-red-50 border border-red-200 px-3 py-1 rounded-full inline-block mb-2.5">
+              🗓️ FINAL STEP BEFORE CLEARANCE
+            </span>
+            <h1 className="text-2xl sm:text-3xl font-black text-[#111827] tracking-tight leading-tight mb-2">
+              Select Your Private Inspection Date &amp; Time
+            </h1>
+            <p className="text-sm sm:text-base text-slate-700 font-medium max-w-xl mx-auto">
+              Choose an available slot on the calendar below to finalize your booking directly into our system.
+            </p>
+          </div>
+
+          {/* 2-Step Action Callout Box */}
+          <div className="bg-amber-50 border-2 border-amber-300 rounded-2xl p-4 mb-4 text-xs sm:text-sm text-amber-950 shadow-2xs">
+            <div className="flex items-center gap-2 font-black text-amber-900 text-sm mb-1.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
+              <span>TWO STEPS TO LOCK IN YOUR BOOKING:</span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-semibold text-slate-800 mt-2">
+              <div className="bg-white/80 p-2.5 rounded-xl border border-amber-200 flex items-start gap-2">
+                <span className="bg-amber-500 text-white w-5 h-5 rounded-full inline-flex items-center justify-center font-black text-[11px] shrink-0 mt-0.5">1</span>
+                <span>Select your preferred <strong>Date</strong>, pick a <strong>Time slot</strong>, and click <strong>Select Time</strong>.</span>
+              </div>
+              <div className="bg-white/80 p-2.5 rounded-xl border border-amber-200 flex items-start gap-2">
+                <span className="bg-emerald-600 text-white w-5 h-5 rounded-full inline-flex items-center justify-center font-black text-[11px] shrink-0 mt-0.5">2</span>
+                <span>Click the blue <strong>"Schedule Meeting"</strong> button inside the calendar to register it in our CRM!</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Embedded Calendar Container */}
+          <div className="bg-white rounded-3xl border-2 border-slate-300 shadow-xl overflow-hidden mb-6 flex flex-col">
+            <div className="px-5 py-3.5 border-b border-slate-200 bg-[#F8FAFC] flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span className="text-xs sm:text-sm font-black text-slate-900">
+                  Live Booking Calendar • Arewa Residences
+                </span>
+              </div>
+              <span className="text-[11px] font-bold text-slate-500">
+                1-on-1 Guided Inspection
+              </span>
+            </div>
+
+            <div className="w-full h-[760px] sm:h-[840px] bg-white relative">
+              <iframe 
+                src={calendarUrl}
+                title="Arewa Residences Private Inspection Calendar"
+                className="w-full h-full border-0"
+              />
+            </div>
+          </div>
+
+          {/* Action Button to Proceed to Thank You Page */}
+          <div className="bg-white rounded-3xl border-2 border-slate-300 p-5 sm:p-6 text-center shadow-lg">
+            <p className="text-sm sm:text-base font-extrabold text-slate-900 mb-1">
+              Have you clicked "Schedule Meeting" inside the calendar above?
+            </p>
+            <p className="text-xs sm:text-sm text-slate-600 font-medium mb-4 max-w-md mx-auto">
+              Once you confirm your booking on the calendar, click below to see your security gate clearance pass and WhatsApp notice instructions:
+            </p>
+            <button
+              onClick={() => {
+                setScreen('THANK_YOU');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className="w-full bg-gradient-to-r from-[#B8001F] via-[#DC2626] to-[#8B0000] hover:brightness-110 active:scale-[0.99] text-white rounded-2xl py-4.5 px-6 shadow-xl hover:shadow-2xl transition-all duration-200 flex items-center justify-center gap-2 text-base sm:text-lg font-black cursor-pointer group"
+            >
+              <span>Yes, I've Scheduled My Meeting → View Gate Clearance</span>
+              <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </button>
+            <p className="text-[11px] text-slate-400 mt-2 font-medium">
+              ⚠️ If you haven't clicked "Schedule Meeting" inside the calendar above yet, please do so first so our advisor sees it!
+            </p>
+          </div>
+
+        </main>
+
+        <footer className="border-t border-slate-200 bg-white py-4 px-4 text-center text-xs text-slate-500">
+          <p>© {new Date().getFullYear()} Beacon Corporate Realty Ltd. Arewa Residences • Kaduna</p>
+        </footer>
+      </div>
+    );
+  }
+
+  // --------------------------------------------------------------------------
+  // SCREEN 6: THANK YOU PAGE (WHATSAPP MOCKUP & CLEARANCE INSTRUCTIONS)
+  // --------------------------------------------------------------------------
+  if (screen === 'THANK_YOU') {
+    const selectedPlotSize = answers.q3?.size || '250 SQM';
+    const selectedPrice = answers.q3?.price || '₦5.5M';
+    const inspectionTime = answers.q4?.title || 'Selected Calendar Slot';
+
+    return (
+      <div className="min-h-screen bg-slate-100/90 text-[#0F172A] flex flex-col justify-center px-4 py-8 sm:py-12 font-sans selection:bg-[#B8001F] selection:text-white">
+        
+        {/* Minimal header */}
+        <div className="max-w-xl mx-auto w-full flex items-center justify-between mb-6 sm:mb-8">
+          <div className="flex items-center gap-2.5">
+            <img 
+              src="/beacon-logo.png" 
+              alt="Beacon Corporate Realty" 
+              className="h-9 sm:h-10 w-auto object-contain shrink-0"
+              onError={(e) => { e.target.style.display = 'none'; }}
+            />
+            <div>
+              <span className="text-xs sm:text-sm font-black text-[#111827] block leading-tight">
+                BEACON CORPORATE REALTY LTD
+              </span>
+              <span className="text-[10px] font-semibold text-[#B8001F] uppercase block">
+                Arewa Residences • Kaduna
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-1.5 text-xs font-bold text-[#78350F] bg-amber-50 px-3 py-1.5 rounded-full border border-amber-300">
+            <Award className="w-3.5 h-3.5 text-[#D4AF37] fill-[#D4AF37]" />
+            <span>C OF O TITLE</span>
+          </div>
+        </div>
+
+        <div className="max-w-xl mx-auto w-full py-2 sm:py-4 animate-fade-in text-center">
+          
+          {/* Top Success Badge */}
+          <div className="mb-6">
+            <div className="inline-flex items-center gap-2 bg-emerald-50 border border-emerald-300 text-emerald-800 px-4 py-1.5 rounded-full text-xs font-extrabold mb-3 shadow-2xs">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span>DISPATCHED TO YOUR WHATSAPP &amp; EMAIL</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-[#111827] tracking-tight leading-tight mb-2">
+              Reservation Received! 🏛️
+            </h1>
+            <p className="text-sm sm:text-base text-slate-700 font-medium max-w-lg mx-auto">
+              Thank you, <strong className="text-slate-900">{leadData.name || 'Valued Buyer'}</strong>. We have dispatched your VIP Site Inspection confirmation &amp; clearance instructions.
+            </p>
+          </div>
+
+          {/* ───────────────────────────────────────────────────────────── */}
+          {/* REALISTIC WHATSAPP CHAT SCREENSHOT MOCKUP                     */}
+          {/* ───────────────────────────────────────────────────────────── */}
+          <div className="bg-slate-900 rounded-3xl p-3 sm:p-5 shadow-2xl border-2 border-slate-800 mb-6 text-left">
+            
+            {/* Mockup Header Label */}
+            <div className="flex items-center justify-between px-2 pb-3 text-xs text-slate-300">
+              <div className="flex items-center gap-2 font-bold">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+                <span className="text-white font-extrabold tracking-wide">Incoming WhatsApp Message Preview</span>
+              </div>
+              <span className="text-[10px] text-slate-300 bg-slate-800 px-2.5 py-0.5 rounded-full font-semibold border border-slate-700">
+                Your Phone Inbox
+              </span>
+            </div>
+
+            {/* Smartphone Screen Simulator */}
+            <div className="rounded-2xl overflow-hidden border border-slate-700 bg-[#EFEAE2] shadow-inner">
+              
+              {/* WhatsApp App Bar */}
+              <div className="bg-[#075E54] text-white px-3 sm:px-4 py-2.5 flex items-center justify-between shadow-sm">
+                <div className="flex items-center gap-2.5">
+                  <ArrowLeft className="w-4 h-4 text-white/80 cursor-pointer" />
+                  <div className="relative">
+                    <div className="w-9 h-9 rounded-full bg-[#128C7E] border border-white/30 flex items-center justify-center font-black text-sm text-white shadow-xs">
+                      🏛️
+                    </div>
+                    <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-400 border-2 border-[#075E54] rounded-full"></span>
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-bold text-sm leading-tight text-white">Beacon Corporate Realty</span>
+                      <span className="bg-emerald-500 text-white text-[9px] font-black w-3.5 h-3.5 rounded-full inline-flex items-center justify-center" title="Verified Business">
+                        ✓
+                      </span>
+                    </div>
+                    <span className="text-[10px] text-emerald-200 block leading-tight font-medium">
+                      Official Business Account • Online
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 text-white/80">
+                  <Phone className="w-4 h-4" />
+                  <MoreVertical className="w-4 h-4" />
+                </div>
+              </div>
+
+              {/* Chat Wallpaper Canvas */}
+              <div 
+                className="p-3.5 sm:p-5 space-y-3"
+                style={{ 
+                  backgroundImage: 'radial-gradient(#075e54 0.6px, transparent 0.6px)', 
+                  backgroundSize: '16px 16px', 
+                  backgroundColor: '#EFEAE2' 
+                }}
+              >
+                
+                {/* End-to-end Encryption Notice */}
+                <div className="bg-[#FFF3C4] border border-amber-300/80 rounded-xl p-2 text-center text-[10px] text-amber-900 leading-tight shadow-2xs max-w-sm mx-auto font-medium">
+                  🔒 Messages and calls are end-to-end encrypted. No one outside of this chat, not even WhatsApp, can read or listen to them.
+                </div>
+
+                {/* Today Pill */}
+                <div className="text-center">
+                  <span className="bg-white/90 text-slate-600 text-[10px] font-extrabold px-3 py-0.5 rounded-full shadow-2xs uppercase tracking-wider">
+                    Today
+                  </span>
+                </div>
+
+                {/* WhatsApp Speech Bubble (Incoming) */}
+                <div className="relative bg-white rounded-2xl rounded-tl-xs p-4 sm:p-5 shadow-md max-w-md border border-slate-200 text-slate-900 text-xs sm:text-sm leading-relaxed">
+                  
+                  <p className="font-black text-[#075E54] mb-2 flex items-center gap-1.5 text-sm sm:text-base">
+                    <span>Reservation Confirmed! 🏛️</span>
+                  </p>
+                  
+                  <p className="mb-2.5 text-slate-800">
+                    Hello <strong className="text-slate-900">{leadData.name ? leadData.name.trim().split(' ')[0] : 'there'}</strong>, your VIP site inspection for Arewa Residences is reserved for <strong className="text-slate-900">{inspectionTime}</strong>.
+                  </p>
+
+                  <p className="mb-3 text-slate-800">
+                    Our <strong>Senior Beacon Property Advisor</strong> will call you shortly to confirm gate access clearance. Location pin &amp; master plan details have also been sent to your email.
+                  </p>
+
+                  {/* Callout Box inside WhatsApp Bubble */}
+                  <div className="bg-red-50/90 border-l-4 border-[#B8001F] p-3 rounded-r-xl mb-2.5">
+                    <p className="font-black text-[#99001A] text-xs uppercase tracking-wide">
+                      ⚠️ ACTION REQUIRED:
+                    </p>
+                    <p className="text-xs text-slate-800 font-semibold mt-1 leading-snug">
+                      Please reply <strong className="text-[#99001A] underline font-black">"CONFIRMED"</strong> to this WhatsApp message or reply to your confirmation email to guarantee your gate pass clearance.
+                    </p>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-1.5 border-t border-slate-100 text-[11px] text-slate-500 font-medium">
+                    <span className="italic">— Beacon Corporate Realty</span>
+                    <div className="flex items-center gap-1 text-[10px] text-slate-400">
+                      <span>Just now</span>
+                      <CheckCheck className="w-4 h-4 text-blue-500" />
+                    </div>
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+            {/* Subtitle helper */}
+            <p className="text-center text-xs text-slate-400 font-medium mt-3">
+              👆 Look out for this exact message on your phone's WhatsApp ({leadData.phone || phoneSubscriber})
+            </p>
+
+          </div>
+
+          {/* ───────────────────────────────────────────────────────────── */}
+          {/* CLEAR NEXT STEP INSTRUCTIONS (NO BACKEND BUTTONS)             */}
+          {/* ───────────────────────────────────────────────────────────── */}
+          <div className="bg-white rounded-3xl border-2 border-slate-300 p-5 sm:p-6 shadow-sm mb-6 text-left">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="w-3 h-3 rounded-full bg-[#B8001F]"></span>
+              <h3 className="text-base sm:text-lg font-black text-slate-900 tracking-tight">
+                What You Need To Do Right Now:
+              </h3>
+            </div>
+            <p className="text-xs sm:text-sm text-slate-600 font-medium mb-4">
+              Follow these 2 quick steps to make sure security clears your private inspection pass before your arrival:
+            </p>
+
+            <div className="space-y-3.5">
+              
+              {/* Step 1: WhatsApp instruction */}
+              <div className="flex items-start gap-3.5 p-4 rounded-2xl bg-emerald-50/80 border-2 border-emerald-200">
+                <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white font-black text-sm flex items-center justify-center shrink-0 shadow-xs mt-0.5">
+                  1
+                </div>
+                <div>
+                  <h4 className="text-sm sm:text-base font-extrabold text-slate-900">
+                    Open WhatsApp on your phone &amp; reply "CONFIRMED"
+                  </h4>
+                  <p className="text-xs sm:text-sm text-slate-700 font-medium mt-1 leading-relaxed">
+                    Open the WhatsApp app on your phone right now (<strong className="text-slate-900">{leadData.phone || phoneSubscriber}</strong>). Find the message from <strong>Beacon Corporate Realty</strong> previewed above, and reply with the word <strong className="text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded font-black">CONFIRMED</strong> so our gate security desk immediately approves your clearance pass.
+                  </p>
+                </div>
+              </div>
+
+              {/* Step 2: Email instruction */}
+              <div className="flex items-start gap-3.5 p-4 rounded-2xl bg-slate-50 border-2 border-slate-200">
+                <div className="w-8 h-8 rounded-xl bg-slate-800 text-white font-black text-sm flex items-center justify-center shrink-0 shadow-xs mt-0.5">
+                  2
+                </div>
+                <div>
+                  <h4 className="text-sm sm:text-base font-extrabold text-slate-900">
+                    Check your Email for your GPS Location Pin &amp; Survey Map
+                  </h4>
+                  <p className="text-xs sm:text-sm text-slate-700 font-medium mt-1 leading-relaxed">
+                    We sent your official inspection packet to <strong className="text-slate-900">{leadData.email || 'your email'}</strong>. Please check your inbox (and your <strong>Spam or Promotions</strong> folder if not visible within 2 minutes). Reply or star the email to easily open the GPS map directions on inspection day.
+                  </p>
+                </div>
+              </div>
+
+              {/* Step 3: Advisor call */}
+              <div className="flex items-start gap-3.5 p-4 rounded-2xl bg-amber-50/80 border-2 border-amber-200">
+                <div className="w-8 h-8 rounded-xl bg-amber-600 text-white font-black text-sm flex items-center justify-center shrink-0 shadow-xs mt-0.5">
+                  3
+                </div>
+                <div>
+                  <h4 className="text-sm sm:text-base font-extrabold text-slate-900">
+                    Expect a Brief Call from our Senior Property Advisor
+                  </h4>
+                  <p className="text-xs sm:text-sm text-slate-700 font-medium mt-1 leading-relaxed">
+                    Our advisor assigned to your file will call you directly to confirm directions to New Millennium City, gate clearance, and lock in your 50% presale price reservation.
+                  </p>
+                </div>
               </div>
 
             </div>
           </div>
-        )}
+
+          {/* ───────────────────────────────────────────────────────────── */}
+          {/* SUMMARY CARD OF SELECTED PLOT & OPTIONAL CALENDAR ACCESS      */}
+          {/* ───────────────────────────────────────────────────────────── */}
+          <div className="bg-white rounded-3xl border-2 border-slate-300 p-4 sm:p-5 text-left shadow-xs mb-4">
+            <div className="flex items-center gap-3.5 mb-3.5">
+              <img 
+                src="/arewa-estate-hero.jpg" 
+                alt="Arewa Residences" 
+                className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover border border-slate-200 shrink-0"
+              />
+              <div>
+                <span className="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-red-50 text-[#B8001F] border border-red-200">
+                  50% Presale Confirmed
+                </span>
+                <h3 className="text-base sm:text-lg font-black text-[#111827] mt-1">
+                  Arewa Residences
+                </h3>
+                <p className="text-xs text-slate-600 font-medium">
+                  New Millennium City, Kaduna • Directly on Tarred Road
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2 text-center pt-3 border-t border-slate-200">
+              <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                <span className="text-[9px] uppercase font-bold text-slate-500 block">Plot Size</span>
+                <span className="text-xs font-black text-slate-900">{selectedPlotSize}</span>
+              </div>
+              <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                <span className="text-[9px] uppercase font-bold text-slate-500 block">Presale Rate</span>
+                <span className="text-xs font-black text-[#B8001F]">{selectedPrice}</span>
+              </div>
+              <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                <span className="text-[9px] uppercase font-bold text-slate-500 block">Inspection</span>
+                <span className="text-xs font-black text-emerald-700">{inspectionTime}</span>
+              </div>
+            </div>
+
+            {/* Modify Calendar Slot Button */}
+            <div className="mt-4 pt-3 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs">
+              <span className="text-slate-600 font-medium text-center sm:text-left">
+                Need to change or adjust your inspection time slot?
+              </span>
+              <button
+                onClick={() => {
+                  setScreen('CALENDAR');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className="text-xs font-extrabold text-[#B8001F] hover:text-[#8B0000] underline cursor-pointer shrink-0 flex items-center gap-1"
+              >
+                <Calendar className="w-3.5 h-3.5" />
+                <span>Modify Slot on Calendar 🗓️ →</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
 
       </div>
     );
