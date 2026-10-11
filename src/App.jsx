@@ -274,9 +274,9 @@ export default function App() {
     setIsSubmitting(true);
 
     const selectedObjective = answers.q2?.title || 'Buy & Build (Family Residence)';
-    const selectedPlot = answers.q3?.title || '250 SQM (₦5.5M Presale)';
+    const selectedPlot = answers.q3?.title || '250 SQM (₦7.15M Presale)';
     const selectedPlotSize = answers.q3?.size || '250 SQM';
-    const selectedPresalePrice = answers.q3?.price || '₦5.5M';
+    const selectedPresalePrice = answers.q3?.price || '₦7.15M';
     const selectedActualPrice = answers.q3?.actualPrice || '₦11M';
     const inspectionTime = answers.q4?.title || 'This Week';
 
@@ -556,7 +556,7 @@ export default function App() {
                   50% Instant Presale Margin
                 </h3>
                 <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                  Enter at ₦3.5M instead of ₦7M, or ₦5.5M instead of ₦11M. Lock in 100% price upside the moment the estate launches publicly.
+                  Enter at ₦4.55M instead of ₦7M, or ₦7.15M instead of ₦11M. Lock in 100% price upside the moment the estate launches publicly.
                 </p>
               </div>
 
@@ -936,7 +936,7 @@ export default function App() {
   // --------------------------------------------------------------------------
   if (screen === 'OPT_IN') {
     const selectedPlotSize = answers.q3?.size || '250 SQM';
-    const selectedPrice = answers.q3?.price || '₦5.5M';
+    const selectedPrice = answers.q3?.price || '₦7.15M';
     const selectedActual = answers.q3?.actualPrice || '₦11M';
 
     const filteredCountries = countrySearch.trim()
@@ -1290,7 +1290,7 @@ export default function App() {
   // --------------------------------------------------------------------------
   if (screen === 'THANK_YOU') {
     const selectedPlotSize = answers.q3?.size || '250 SQM';
-    const selectedPrice = answers.q3?.price || '₦5.5M';
+    const selectedPrice = answers.q3?.price || '₦7.15M';
     const inspectionTime = answers.q4?.title || 'Selected Calendar Slot';
 
     return (
